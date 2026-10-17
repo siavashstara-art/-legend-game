@@ -36,6 +36,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: 4.5 Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 4.6 Install Android SDK Platforms & Build Tools
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platforms;android-33" "build-tools;33.0.2" "platform-tools"
+
       - name: 5. Scaffold Android Project Structure (Auto-Guarantee)
         run: |
           # 5.1 Root build.gradle

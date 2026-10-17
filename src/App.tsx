@@ -671,6 +671,15 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#14110f] text-[#f5ecd9] flex flex-col items-center p-2.5 sm:p-5 select-none transition-colors">
       <div className="w-full max-w-[540px] flex flex-col gap-2.5">
+        {/* Top Branding Banner */}
+        <div className="w-full py-1.5 px-3 rounded-xl bg-gradient-to-r from-amber-950/80 via-stone-900/90 to-amber-950/80 border border-amber-500/40 text-center shadow-md flex items-center justify-center gap-2 flex-wrap text-xs">
+          <span className="font-black text-amber-300 tracking-wider">able city</span>
+          <span className="text-amber-500">•</span>
+          <span className="font-bold text-stone-200">اکوسیستم آفرینا</span>
+          <span className="text-amber-500">•</span>
+          <span className="font-mono text-emerald-400 font-bold">fb new meta</span>
+        </div>
+
         {/* Top Header Row */}
         <header className="flex items-center justify-between pb-1.5 border-b border-[#3a322b]">
           <div className="flex items-center gap-2">
