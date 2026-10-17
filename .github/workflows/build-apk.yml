@@ -20,11 +20,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: 3. Install Dependencies & Build Web Game Asset
         run: |
-          npm ci || npm install
+          npm install --legacy-peer-deps
           npm run build
           mkdir -p app/src/main/assets
           if [ -d "dist" ]; then
