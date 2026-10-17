@@ -1,6 +1,6 @@
 import React from 'react';
 import { CIVILIZATIONS } from '../utils/civilizations.ts';
-import { PieceStyle, BoardTheme, TranslationDictionary } from '../types/chess.ts';
+import { PieceStyle, BoardTheme, TranslationDictionary, Language } from '../types/chess.ts';
 import { ChessPiece } from './ChessPiece.tsx';
 import { Globe2, X, Check, Sparkles } from 'lucide-react';
 
@@ -13,7 +13,7 @@ interface CivilizationModalProps {
   onToggleMetallurgy?: () => void;
   onSelectCivilization: (pieceStyle: PieceStyle, boardTheme: BoardTheme) => void;
   t: TranslationDictionary;
-  lang: 'fa' | 'en';
+  lang: Language;
 }
 
 export const CivilizationModal: React.FC<CivilizationModalProps> = ({

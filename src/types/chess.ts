@@ -107,7 +107,7 @@ export interface MoveRecord {
   fen: string;
 }
 
-export type Language = 'fa' | 'en';
+export type Language = 'fa' | 'en' | 'az' | 'ar' | 'mzn' | 'glk';
 
 export interface TranslationDictionary {
   title: string;

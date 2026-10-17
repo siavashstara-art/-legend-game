@@ -1,6 +1,6 @@
 import React from 'react';
 import { Swords, X, Play, Trophy, Sparkles, Award, ShieldAlert, CheckCircle } from 'lucide-react';
-import { PieceStyle, BoardTheme } from '../types/chess.ts';
+import { PieceStyle, BoardTheme, Language } from '../types/chess.ts';
 
 export interface MythicScenario {
   id: string;
@@ -87,7 +87,7 @@ interface MythicCampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLoadScenario: (scenario: MythicScenario) => void;
-  lang: 'fa' | 'en';
+  lang: Language;
 }
 
 export const MythicCampaignModal: React.FC<MythicCampaignModalProps> = ({

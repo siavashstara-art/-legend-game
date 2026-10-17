@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Trophy, Share2, Copy, Check, RotateCcw, X, Sparkles } from 'lucide-react';
-import { PieceStyle, BoardTheme, Color } from '../types/chess.ts';
+import { PieceStyle, BoardTheme, Color, Language } from '../types/chess.ts';
 import { CIVILIZATIONS } from '../utils/civilizations.ts';
 import { ChessPiece } from './ChessPiece.tsx';
 
@@ -15,7 +15,7 @@ interface VictoryCardModalProps {
   boardTheme: BoardTheme;
   enableMetallurgy: boolean;
   onNewGame: () => void;
-  lang: 'fa' | 'en';
+  lang: Language;
 }
 
 export const VictoryCardModal: React.FC<VictoryCardModalProps> = ({

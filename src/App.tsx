@@ -176,12 +176,16 @@ export default function App() {
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('lang', lang);
-    root.setAttribute('dir', lang === 'fa' ? 'rtl' : 'ltr');
+    root.setAttribute('dir', ['fa', 'ar', 'mzn', 'glk', 'az'].includes(lang) ? 'rtl' : 'ltr');
     localStorage.setItem('worldplay_lang', lang);
   }, [lang]);
 
   const toggleLanguage = () => {
-    setLang(prev => (prev === 'fa' ? 'en' : 'fa'));
+    setLang(prev => {
+      const langs: Language[] = ['fa', 'en', 'az', 'ar', 'mzn', 'glk'];
+      const idx = langs.indexOf(prev);
+      return langs[(idx + 1) % langs.length];
+    });
   };
 
   const totalAllowed = activeBooster ? BOOSTERS_CONFIG[activeBooster] : baseTurnSeconds;
@@ -837,6 +841,24 @@ export default function App() {
         {/* Settings Tray (Collapsible) */}
         {showSettings && (
           <div className="bg-[#1e1914] border border-[#5a4630]/70 rounded-xl p-3 shadow-lg grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs animate-in slide-in-from-top-2 duration-150">
+            <div>
+              <label className="block text-stone-400 text-[10px] uppercase font-bold mb-1">
+                {lang === 'fa' ? 'زبان / Language' : 'Language'}
+              </label>
+              <select
+                value={lang}
+                onChange={e => setLang(e.target.value as Language)}
+                className="w-full bg-[#2a231d] border border-stone-700 rounded-md p-1.5 text-stone-200 cursor-pointer focus:outline-none"
+              >
+                <option value="fa">فارسی 🇮🇷</option>
+                <option value="en">English 🇬🇧</option>
+                <option value="az">Azərbaycan 🇦🇿</option>
+                <option value="ar">العربية 🇸🇦</option>
+                <option value="mzn">مازندرانی 🇮🇷</option>
+                <option value="glk">گیلکی 🇮🇷</option>
+              </select>
+            </div>
+
             <div>
               <label className="block text-stone-400 text-[10px] uppercase font-bold mb-1">
                 {t.mode}

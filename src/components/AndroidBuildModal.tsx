@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { X, Smartphone, CheckCircle, Terminal, ShieldCheck, Cpu, Code2 } from 'lucide-react';
+import { Language } from '../types/chess.ts';
 
 interface AndroidBuildModalProps {
   isOpen: boolean;
   onClose: () => void;
-  lang: 'fa' | 'en';
+  lang: Language;
 }
 
 export const AndroidBuildModal: React.FC<AndroidBuildModalProps> = ({
