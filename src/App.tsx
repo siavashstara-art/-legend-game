@@ -24,7 +24,9 @@ import {
   playCheckSound,
   playBoosterSound,
   playLowTimeTick,
-  playVictoryFanfare
+  playVictoryFanfare,
+  playMetallicClashSound,
+  playCivilizationAnthem
 } from './utils/audio.ts';
 import { chooseBotMove, shouldBotUseBooster } from './utils/ai.ts';
 import { ChessBoard } from './components/ChessBoard.tsx';
@@ -41,6 +43,8 @@ import { LegalDisclaimerModal } from './components/LegalDisclaimerModal.tsx';
 import { CommunityRewardModal } from './components/CommunityRewardModal.tsx';
 import { CivilizationModal } from './components/CivilizationModal.tsx';
 import { AndroidBuildModal } from './components/AndroidBuildModal.tsx';
+import { VictoryCardModal } from './components/VictoryCardModal.tsx';
+import { MythicCampaignModal, MythicScenario } from './components/MythicCampaignModal.tsx';
 import { CIVILIZATIONS } from './utils/civilizations.ts';
 import {
   RotateCcw,
@@ -56,7 +60,8 @@ import {
   Gift,
   Globe2,
   Smartphone,
-  Sparkles
+  Sparkles,
+  Swords
 } from 'lucide-react';
 
 const BOOSTERS_CONFIG: Record<BoosterTier, number> = {
@@ -114,6 +119,11 @@ export default function App() {
   const [showCommunity, setShowCommunity] = useState<boolean>(false);
   const [showCivilizations, setShowCivilizations] = useState<boolean>(false);
   const [showAndroidModal, setShowAndroidModal] = useState<boolean>(false);
+  const [showVictoryCard, setShowVictoryCard] = useState<boolean>(false);
+  const [showCampaign, setShowCampaign] = useState<boolean>(false);
+  const [clashSquare, setClashSquare] = useState<Square | null>(null);
+  const [gameStartTime, setGameStartTime] = useState<number>(() => Date.now());
+  const [gameWinner, setGameWinner] = useState<Color>('w');
   const [aiTip, setAiTip] = useState<string | null>(null);
   const [loadingAiTip, setLoadingAiTip] = useState<boolean>(false);
 
@@ -347,7 +357,10 @@ export default function App() {
           // Black captured a white piece
           setCapturedWhite(prev => [...prev, moveRes.captured as PieceType]);
         }
+        setClashSquare(to);
+        setTimeout(() => setClashSquare(null), 500);
         playCaptureSound(!soundEnabled);
+        playMetallicClashSound(!soundEnabled);
       } else {
         playMoveSound(!soundEnabled);
       }
@@ -373,10 +386,12 @@ export default function App() {
       // Check game-ending states
       if (game.isCheckmate()) {
         setIsGameOver(true);
+        setGameWinner(moveRes.color);
         const winnerName = moveRes.color === 'w' ? t.whiteWon : t.blackWon;
         const msg = `${t.checkmate} ${winnerName}${t.winnerMsg}`;
         setResultMessage(msg);
         setGameOverModalOpen(true);
+        setTimeout(() => setShowVictoryCard(true), 1200);
         playVictoryFanfare(!soundEnabled);
         submitGameScore(moveRes.color === 'w' ? 'win' : 'loss');
       } else if (game.isStalemate()) {
@@ -598,6 +613,27 @@ export default function App() {
     setBoardTheme(selectedTheme);
     localStorage.setItem('worldplay_piece_style', selectedStyle);
     localStorage.setItem('worldplay_board_theme', selectedTheme);
+    playCivilizationAnthem(selectedStyle, !soundEnabled);
+  };
+
+  const handleLoadScenario = (scenario: MythicScenario) => {
+    const newGame = new Chess(scenario.fen);
+    setGame(newGame);
+    setPieceStyle(scenario.civId);
+    setBoardTheme(scenario.boardTheme);
+    setSelectedSquare(null);
+    setValidTargets([]);
+    setLastMove(null);
+    setMoveHistory([]);
+    setIsGameOver(false);
+    setRemainingSeconds(baseTurnSeconds);
+    setGameStartTime(Date.now());
+    setCoins(prev => {
+      const updated = prev + scenario.rewardCoins;
+      localStorage.setItem('worldplay_coins', String(updated));
+      return updated;
+    });
+    playCivilizationAnthem(scenario.civId, !soundEnabled);
   };
 
   // Keyboard shortcuts
@@ -688,6 +724,19 @@ export default function App() {
               </span>
               <span className="font-bold text-xs hidden xs:inline">
                 {t.civilizationsBtn}
+              </span>
+            </button>
+
+            {/* Mythic Campaign & Historical Puzzles Button */}
+            <button
+              onClick={() => setShowCampaign(true)}
+              className="p-1.5 px-2 rounded-lg bg-[#2d1515] hover:bg-[#3d1c1c] border border-rose-500/70 text-rose-300 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+              title={lang === 'fa' ? 'نبردهای داستانی و معماهای تاریخی اساطیر' : 'Mythic Story Battles & Historical Puzzles'}
+              aria-label="Story Battles"
+            >
+              <Swords size={15} className="text-rose-400" />
+              <span className="font-bold text-xs hidden sm:inline">
+                {lang === 'fa' ? 'نبردهای داستانی' : 'Story Battles'}
               </span>
             </button>
 
@@ -955,6 +1004,7 @@ export default function App() {
             theme={boardTheme}
             pieceStyle={pieceStyle}
             enableMetallurgy={enableMetallurgy}
+            clashSquare={clashSquare}
             onSquareClick={handleSquareClick}
             isGameOver={isGameOver}
           />
@@ -1152,6 +1202,29 @@ export default function App() {
       <AndroidBuildModal
         isOpen={showAndroidModal}
         onClose={() => setShowAndroidModal(false)}
+        lang={lang}
+      />
+
+      {/* Royal Victory Social Share Card Modal */}
+      <VictoryCardModal
+        isOpen={showVictoryCard}
+        onClose={() => setShowVictoryCard(false)}
+        winner={gameWinner}
+        totalMoves={moveHistory.length}
+        gameDurationSeconds={Math.max(1, Math.floor((Date.now() - gameStartTime) / 1000))}
+        capturedCount={capturedWhite.length + capturedBlack.length}
+        pieceStyle={pieceStyle}
+        boardTheme={boardTheme}
+        enableMetallurgy={enableMetallurgy}
+        onNewGame={handleNewGame}
+        lang={lang}
+      />
+
+      {/* Mythic Campaign & Historical Puzzles Modal */}
+      <MythicCampaignModal
+        isOpen={showCampaign}
+        onClose={() => setShowCampaign(false)}
+        onLoadScenario={handleLoadScenario}
         lang={lang}
       />
     </div>

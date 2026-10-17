@@ -12,6 +12,7 @@ interface ChessBoardProps {
   theme: BoardTheme;
   pieceStyle: PieceStyle;
   enableMetallurgy?: boolean;
+  clashSquare?: Square | null;
   onSquareClick: (square: Square) => void;
   isGameOver: boolean;
 }
@@ -115,6 +116,7 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
   theme,
   pieceStyle,
   enableMetallurgy = false,
+  clashSquare = null,
   onSquareClick,
   isGameOver,
 }) => {
@@ -233,6 +235,13 @@ export const ChessBoard: React.FC<ChessBoardProps> = ({
                       : 'w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-black/25 dark:bg-black/35 shadow-inner'
                   }`}
                 />
+              )}
+
+              {/* Metallic Clash Spark FX */}
+              {clashSquare === squareName && (
+                <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center animate-ping">
+                  <div className="w-8 h-8 rounded-full bg-amber-400/90 shadow-[0_0_20px_#f59e0b] border-2 border-white" />
+                </div>
               )}
 
               {/* Piece */}
