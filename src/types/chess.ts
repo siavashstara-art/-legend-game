@@ -56,7 +56,8 @@ export type PieceStyle =
   | 'nordic'
   | 'alchemy'
   | 'vector'
-  | 'classic';
+  | 'classic'
+  | 'samanid';
 
 export interface Civilization {
   id: PieceStyle;
@@ -107,7 +108,7 @@ export interface MoveRecord {
   fen: string;
 }
 
-export type Language = 'fa' | 'en' | 'az' | 'ar' | 'mzn' | 'glk';
+export type Language = 'fa' | 'en' | 'az' | 'ar' | 'mzn' | 'glk' | 'es' | 'zh' | 'tr' | 'ja' | 'hi' | 'ru';
 
 export interface TranslationDictionary {
   title: string;

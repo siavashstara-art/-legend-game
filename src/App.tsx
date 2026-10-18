@@ -30,6 +30,7 @@ import {
 } from './utils/audio.ts';
 import { chooseBotMove, shouldBotUseBooster } from './utils/ai.ts';
 import { ChessBoard } from './components/ChessBoard.tsx';
+import { ChessBoard3D } from './components/ChessBoard3D.tsx';
 import { TurnTimer } from './components/TurnTimer.tsx';
 import { BoosterCards } from './components/BoosterCards.tsx';
 import { CapturedPieces } from './components/CapturedPieces.tsx';
@@ -126,6 +127,9 @@ export default function App() {
   const [gameWinner, setGameWinner] = useState<Color>('w');
   const [aiTip, setAiTip] = useState<string | null>(null);
   const [loadingAiTip, setLoadingAiTip] = useState<boolean>(false);
+  const [is3D, setIs3D] = useState<boolean>(() => {
+    return localStorage.getItem('worldplay_is3d') === 'true';
+  });
 
   // VIP In-Game Perks unlocked via Socials
   const [unlockedPlatinum, setUnlockedPlatinum] = useState<boolean>(() => {
@@ -856,6 +860,12 @@ export default function App() {
                 <option value="ar">العربية 🇸🇦</option>
                 <option value="mzn">مازندرانی 🇮🇷</option>
                 <option value="glk">گیلکی 🇮🇷</option>
+                <option value="es">Español 🇪🇸</option>
+                <option value="zh">中文 🇨🇳</option>
+                <option value="tr">Türkçe 🇹🇷</option>
+                <option value="ja">日本語 🇯🇵</option>
+                <option value="hi">हिन्दी 🇮🇳</option>
+                <option value="ru">Русский 🇷🇺</option>
               </select>
             </div>
 
@@ -920,6 +930,26 @@ export default function App() {
                 <option value="slate">{t.slateTheme}</option>
                 <option value="amber">{t.amberTheme}</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block text-stone-400 text-[10px] uppercase font-bold mb-1">
+                {lang === 'fa' ? 'نمایش' : 'View'}
+              </label>
+              <button
+                onClick={() => {
+                  const newIs3D = !is3D;
+                  setIs3D(newIs3D);
+                  localStorage.setItem('worldplay_is3d', String(newIs3D));
+                }}
+                className={`w-full rounded-md p-1.5 text-xs font-bold transition-colors cursor-pointer border ${
+                  is3D
+                    ? 'bg-amber-600 border-amber-500 text-stone-900'
+                    : 'bg-[#2a231d] border-stone-700 text-stone-200'
+                }`}
+              >
+                {is3D ? (lang === 'fa' ? 'سه‌بعدی (۳D)' : '3D Mode') : (lang === 'fa' ? 'دو‌بعدی (۲D)' : '2D Mode')}
+              </button>
             </div>
 
             <div>
@@ -1026,19 +1056,23 @@ export default function App() {
 
         {/* Chess Board Container */}
         <div className="flex justify-center w-full">
-          <ChessBoard
-            game={game}
-            selectedSquare={selectedSquare}
-            validTargets={validTargets}
-            lastMove={lastMove}
-            flipped={flipped}
-            theme={boardTheme}
-            pieceStyle={pieceStyle}
-            enableMetallurgy={enableMetallurgy}
-            clashSquare={clashSquare}
-            onSquareClick={handleSquareClick}
-            isGameOver={isGameOver}
-          />
+          {is3D ? (
+            <ChessBoard3D theme={boardTheme} game={game} />
+          ) : (
+            <ChessBoard
+              game={game}
+              selectedSquare={selectedSquare}
+              validTargets={validTargets}
+              lastMove={lastMove}
+              flipped={flipped}
+              theme={boardTheme}
+              pieceStyle={pieceStyle}
+              enableMetallurgy={enableMetallurgy}
+              clashSquare={clashSquare}
+              onSquareClick={handleSquareClick}
+              isGameOver={isGameOver}
+            />
+          )}
         </div>
 
         {/* Booster Cards Panel */}

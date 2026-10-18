@@ -180,5 +180,20 @@ export const CIVILIZATIONS: Civilization[] = [
     descriptionFa: 'مهد استادان نامدار شطرنج جهان؛ برج اسپاسکایا کرملین و گنبدهای پیازی سن باسیل به جای رخ، پهلوان بوگاتیر و اسب قزاق به عنوان اسب، اسقف ارتدکس با عصای زرین به عنوان فیل، و محافظان اشترلتسی با کلاه پوستین به عنوان پیاده.',
     descriptionEn: 'Legendary homeland of world chess grandmasters; Spasskaya Kremlin Tower & Saint Basil domes as rooks, Bogatyr steed knights, Orthodox Patriarch bishops, and Streltsy fur-cap imperial pawns.',
     bannerColor: 'from-blue-900 via-indigo-950 to-amber-600'
+  },
+  {
+    id: 'samanid',
+    nameFa: 'امپراتوری سامانیان بخارا',
+    nameEn: 'Samanid Empire of Bukhara',
+    flag: '🕌',
+    country: 'Tajikistan / Uzbekistan',
+    kingNameFa: 'امیر مسعود سامانی (امیر فرزانه بخارا)',
+    kingNameEn: 'Emir Masoud Samani (Wise Emir of Bukhara)',
+    queenNameFa: 'ملکه دربار بخارا (بانوی خردمند سمرقند)',
+    queenNameEn: 'Queen of Bukhara (Wise Lady of Samarkand)',
+    boardTheme: 'apadana',
+    descriptionFa: 'تمدن شکوفای سامانیان در بخارا و سمرقند؛ اسب‌های سواره‌نظام ماورالنهر، مساجد باشکوه با گنبدهای آبی فیروزه‌ای، دانشمندان بزرگ بخارا و جنگجویان غزنوی.',
+    descriptionEn: 'The glorious Samanid civilization of Bukhara and Samarkand; Transoxiana heavy cavalry, turquoise-domed mosques, scholars of Bukhara, and elite warriors.',
+    bannerColor: 'from-blue-800 via-sky-600 to-amber-700'
   }
 ];
