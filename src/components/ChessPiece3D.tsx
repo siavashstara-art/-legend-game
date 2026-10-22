@@ -9,78 +9,71 @@ interface ChessPiece3DProps {
   enableMetallurgy?: boolean;
 }
 
-// 6 Alchemical Sacred Metallurgy Materials with high-precision PBR properties
+// 6 Alchemical Sacred Metallurgy Materials according to imperial specifications
 const ALCHEMY_PALETTE: Record<
   PieceType,
   {
-    whiteBase: string;
-    whiteSpecular: string;
-    blackBase: string;
-    blackSpecular: string;
+    baseColor: string;
+    specularColor: string;
     metalness: number;
     roughness: number;
     clearcoat: number;
+    titleFa: string;
   }
 > = {
   // 1. شاه: طلای خالص ۲۴ عیار سلطنتی (24K Pure Imperial Sovereign Gold)
   k: {
-    whiteBase: '#f59e0b',
-    whiteSpecular: '#fef08a',
-    blackBase: '#854d0e',
-    blackSpecular: '#a16207',
+    baseColor: '#f59e0b', // Radiant Gold
+    specularColor: '#fef08a',
     metalness: 0.98,
     roughness: 0.12,
-    clearcoat: 0.98
+    clearcoat: 0.98,
+    titleFa: 'شاه طلایی ۲۴ عیار'
   },
-  // 2. ملکه و وزیر: طلای زرین با تاج و نگین‌های نقره‌ای خالص (Queen Royal Gold & Silver Vizier)
+  // 2. ملکه و وزیر: پیکر طلایی با تاج و وزیر نقره‌ای خالص (Queen Gold Body & Sterling Silver Vizier)
   q: {
-    whiteBase: '#fbbf24',
-    whiteSpecular: '#ffffff',
-    blackBase: '#713f12',
-    blackSpecular: '#64748b',
+    baseColor: '#fbbf24', // Imperial Gold
+    specularColor: '#ffffff',
     metalness: 0.96,
     roughness: 0.14,
-    clearcoat: 0.96
+    clearcoat: 0.96,
+    titleFa: 'ملکه طلایی با وزیر نقره‌ای'
   },
-  // 3. فیل: برنز کهن اساطیری هلنی و پارسی (Ancient Mythic Bronze)
+  // 3. فیل: برنز کهن اساطیری و صیقلی (Ancient Mythic Polished Bronze)
   b: {
-    whiteBase: '#d97706',
-    whiteSpecular: '#fbbf24',
-    blackBase: '#78350f',
-    blackSpecular: '#92400e',
+    baseColor: '#d97706', // Rich Metallic Bronze
+    specularColor: '#fbbf24',
     metalness: 0.88,
     roughness: 0.22,
-    clearcoat: 0.85
+    clearcoat: 0.85,
+    titleFa: 'فیل برنز کهن'
   },
-  // 4. اسب: چوب نفیس خراطی‌شده ساج، آبنوس و گردو (Hand-carved Sacred Artisan Wood)
+  // 4. اسب: چوب نفیس خراطی‌شده ساج و گردو (Hand-carved Sacred Artisan Hardwood)
   n: {
-    whiteBase: '#854d0e',
-    whiteSpecular: '#a16207',
-    blackBase: '#2e1810',
-    blackSpecular: '#451a03',
+    baseColor: '#854d0e', // Warm Deep Wood
+    specularColor: '#a16207',
     metalness: 0.04,
-    roughness: 0.80,
-    clearcoat: 0.20
+    roughness: 0.78,
+    clearcoat: 0.25,
+    titleFa: 'اسب چوبی خراطی‌شده'
   },
-  // 5. رخ: آلومینیوم صیقلی دژ و هوافضا (Brushed Citadel Aerospace Aluminum)
+  // 5. رخ: آلومینیوم صیقلی دژ و هوافضا (Brushed Bright Aerospace Aluminum)
   r: {
-    whiteBase: '#cbd5e1',
-    whiteSpecular: '#f1f5f9',
-    blackBase: '#1e293b',
-    blackSpecular: '#475569',
-    metalness: 0.92,
-    roughness: 0.18,
-    clearcoat: 0.90
+    baseColor: '#e2e8f0', // Bright Metallic Aluminum
+    specularColor: '#ffffff',
+    metalness: 0.94,
+    roughness: 0.16,
+    clearcoat: 0.92,
+    titleFa: 'رخ آلومینیوم صیقلی'
   },
   // 6. سربازان: آهن گداخته و فولاد دمشقی (Forged Damascus Meteoric Iron)
   p: {
-    whiteBase: '#475569',
-    whiteSpecular: '#64748b',
-    blackBase: '#0f172a',
-    blackSpecular: '#1e293b',
-    metalness: 0.78,
-    roughness: 0.36,
-    clearcoat: 0.60
+    baseColor: '#475569', // Dark Meteoric Iron
+    specularColor: '#64748b',
+    metalness: 0.82,
+    roughness: 0.35,
+    clearcoat: 0.60,
+    titleFa: 'سرباز آهنی فورج‌شده'
   }
 };
 
@@ -92,48 +85,61 @@ export const ChessPiece3D: React.FC<ChessPiece3DProps> = ({
 }) => {
   const isWhite = color === 'w';
 
-  // Primary Material computation
+  // Primary Material computation - Maintains fundamental metal identity
   const primaryMaterial = useMemo(() => {
     const config = ALCHEMY_PALETTE[type];
-    const baseColor = isWhite ? config.whiteBase : config.blackBase;
+    // Slightly adjust tone for dark team patina without losing metal identity
+    const baseColor = isWhite ? config.baseColor : THREE.Color.NAMES[type === 'r' ? 'slategrey' : 'darkgoldenrod'] || config.baseColor;
+    
+    // Create distinct physical material for each piece type
+    let col = config.baseColor;
+    if (!isWhite) {
+      if (type === 'k') col = '#d97706'; // Deep Royal Gold Patina
+      else if (type === 'q') col = '#ca8a04'; // Deep Gold
+      else if (type === 'b') col = '#b45309'; // Antique Deep Bronze
+      else if (type === 'n') col = '#542609'; // Deep Ebony Wood
+      else if (type === 'r') col = '#94a3b8'; // Dark Anodized Aluminum
+      else if (type === 'p') col = '#334155'; // Dark Damascus Iron
+    }
+
     return new THREE.MeshPhysicalMaterial({
-      color: baseColor,
+      color: col,
       metalness: config.metalness,
       roughness: config.roughness,
       clearcoat: config.clearcoat,
-      clearcoatRoughness: 0.1,
-      reflectivity: 0.9
+      clearcoatRoughness: 0.12,
+      reflectivity: 0.95
     });
   }, [type, isWhite]);
 
-  // Accent & Trim Material computation
+  // Team Accent & Trim Ring (Emerald/Gold for White Team vs Ruby/Crimson for Black Team)
   const trimMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: isWhite ? '#fbbf24' : '#f43f5e',
+      color: isWhite ? '#10b981' : '#f43f5e',
       metalness: 0.9,
       roughness: 0.2,
-      emissive: isWhite ? '#b45309' : '#881337',
-      emissiveIntensity: isSelected ? 0.6 : 0.25
+      emissive: isWhite ? '#047857' : '#be123c',
+      emissiveIntensity: isSelected ? 0.8 : 0.4
     });
   }, [isWhite, isSelected]);
 
-  // Pure Sterling Silver Material for Vizier accents on Queen
+  // Pure Sterling Silver Material for Vizier accents on Queen (Regardless of team)
   const silverVizierMaterial = useMemo(() => {
     return new THREE.MeshPhysicalMaterial({
-      color: isWhite ? '#f8fafc' : '#64748b',
+      color: '#ffffff',
       metalness: 0.98,
-      roughness: 0.10,
+      roughness: 0.08,
       clearcoat: 0.98,
-      clearcoatRoughness: 0.08
+      clearcoatRoughness: 0.05
     });
-  }, [isWhite]);
+  }, []);
 
-  // Base plinth material
+  // Base plinth material (Ivory White Marble for White Team vs Obsidian Black Basalt for Black Team)
   const plinthMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
-      color: isWhite ? '#1e293b' : '#090d16',
-      metalness: 0.5,
-      roughness: 0.35
+      color: isWhite ? '#f8fafc' : '#0f172a',
+      metalness: isWhite ? 0.3 : 0.7,
+      roughness: 0.25
     });
   }, [isWhite]);
 

@@ -1248,6 +1248,53 @@ export default function App() {
           </div>
         </div>
 
+        {/* Sacred Metallurgy Materials Legend Ribbon */}
+        <div className="p-2.5 rounded-xl bg-gradient-to-r from-amber-950/60 via-[#1f1712] to-amber-950/60 border border-amber-500/50 shadow-md">
+          <div className="flex items-center justify-between mb-1.5 border-b border-amber-900/40 pb-1">
+            <div className="flex items-center gap-1.5 text-xs font-black text-amber-300">
+              <span className="text-base">⚗️</span>
+              <span>{lang === 'fa' ? 'راهنمای متریال اختصاصی مهره‌ها (کیمیای مقدس):' : 'Sacred Metallurgy Piece Materials:'}</span>
+            </div>
+            <button
+              onClick={handleToggleMetallurgy}
+              className={`text-[10px] font-bold px-2 py-0.5 rounded-md border transition-colors cursor-pointer ${
+                enableMetallurgy
+                  ? 'bg-amber-500/20 text-amber-300 border-amber-400/50'
+                  : 'bg-stone-800 text-stone-400 border-stone-700'
+              }`}
+            >
+              {enableMetallurgy ? (lang === 'fa' ? '✓ فعال' : 'Active') : (lang === 'fa' ? 'غیرفعال' : 'Disabled')}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-[11px] text-center font-bold">
+            <div className="p-1 rounded bg-[#2a1d12] border border-amber-500/50 text-amber-300">
+              <span className="block text-xs">👑 شاه</span>
+              <span className="text-[10px] font-mono text-amber-400">طلایی (Gold)</span>
+            </div>
+            <div className="p-1 rounded bg-[#2a1d12] border border-amber-500/50 text-amber-200">
+              <span className="block text-xs">👸 ملکه و وزیر</span>
+              <span className="text-[10px] font-mono text-slate-100">طلا + نقره</span>
+            </div>
+            <div className="p-1 rounded bg-[#2a1d12] border border-amber-700/50 text-amber-400">
+              <span className="block text-xs">🐘 فیل</span>
+              <span className="text-[10px] font-mono text-amber-500">برنز (Bronze)</span>
+            </div>
+            <div className="p-1 rounded bg-[#2a1d12] border border-amber-800/50 text-amber-600">
+              <span className="block text-xs">🐎 اسب</span>
+              <span className="text-[10px] font-mono text-amber-600">چوبی (Wood)</span>
+            </div>
+            <div className="p-1 rounded bg-[#2a1d12] border border-sky-500/50 text-sky-300">
+              <span className="block text-xs">🏰 رخ</span>
+              <span className="text-[10px] font-mono text-sky-200">آلومینیوم</span>
+            </div>
+            <div className="p-1 rounded bg-[#2a1d12] border border-slate-600/50 text-slate-300">
+              <span className="block text-xs">⚔️ سرباز</span>
+              <span className="text-[10px] font-mono text-slate-300">آهنی (Iron)</span>
+            </div>
+          </div>
+        </div>
+
         {/* Chess Board Container */}
         <div className="flex justify-center w-full">
           {is3D ? (

@@ -829,8 +829,18 @@ app.get('/api/loyalty/leaderboard', (req: Request, res: Response) => {
     topChessLeaders,
     ableCityMetadata: {
       cityName: 'شهر توانا (Able City)',
-      descriptionFa: 'کلان‌شهر مجازی، نوآورانه و متصل نخبگان، استراتژیست‌ها و سفیران همجهان با قابلیت توسعه سازه‌های دانشی، تالارهای نبرد و پردیس‌های فرهنگی.',
-      descriptionEn: 'The virtual, connected smart metropolis for strategists, innovators, and ambassadors of Hamjahan.',
+      twinCities: {
+        hamrazFa: 'شهر مجازی همراز (۶۵۰,۰۰۰ متر مربع)',
+        afrenaFa: 'شهر مجازی آفرینا (۶۵۰,۰۰۰ متر مربع)',
+        totalAreaFa: '۱,۳۰۰,۰۰۰ متر مربع متاورس مجازی'
+      },
+      ecosystemAppsCount: 35,
+      roadmap: {
+        phase1Fa: 'فاز ۱ (۱۰,۰۰۰+ دانلود): معرفی ارز و گیم داخلی اکوسیستم',
+        phase2Fa: 'فاز ۲ (۵۰,۰۰۰+ دانلود و ۶۰٪ واگذاری زمین): ارز دیجیتال جهانی و گیم سه‌بعدی 3D Metaverse'
+      },
+      descriptionFa: 'شهر کاملاً مجازی توانا متشکل از دو شهر همراز و آفرینا به وسعت مجموع ۱,۳۰۰,۰۰۰ متر مربع در اکوسیستم ۳۵ برنامه‌ای، بدون ادعای ملکی فیزیکی یا سند تک‌برگ.',
+      descriptionEn: 'The purely virtual smart metaverse of Able City comprising twin cities Hamraz and Afrena (1,300,000 m² total) across a 35-app ecosystem.',
       totalParcelsAllocated: 1240,
       availableParcelsForTrustees: 500,
       foundationYear: '2026'

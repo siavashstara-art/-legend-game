@@ -970,30 +970,30 @@ export const AmbassadorLoyaltyModal: React.FC<AmbassadorLoyaltyModalProps> = ({
             </div>
           )}
 
-          {/* ================= TAB 5: ABLE CITY VIRTUAL LAND PLEDGE ================= */}
+          {/* ================= TAB 5: ABLE CITY VIRTUAL LAND PLEDGE & ROADMAP ================= */}
           {activeTab === 'able_city' && (
             <div className="space-y-6">
-              {/* Virtual Land Pledge Card */}
-              <div className="relative p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#221a14] via-[#1a140f] to-[#140f0c] border-4 border-[#d4af37] shadow-2xl text-center space-y-4 overflow-hidden">
+              {/* Virtual Land Pledge & Twin City Header Card */}
+              <div className="relative p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#221a14] via-[#1a140f] to-[#140f0c] border-4 border-[#d4af37] shadow-2xl space-y-5 overflow-hidden">
                 {/* Visual Ambient Glow */}
                 <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
                 <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-sky-500/10 blur-2xl pointer-events-none" />
 
                 <div className="flex flex-wrap items-center justify-between border-b border-[#5a4630]/60 pb-4 gap-2">
                   <div className="text-right">
-                    <span className="text-[10px] text-stone-400 block font-mono">ABLE CITY VIRTUAL PLEDGE</span>
-                    <span className="text-xs font-black text-amber-400">قول و رزرو قطعه در شهر مجازی</span>
+                    <span className="text-[10px] text-stone-400 block font-mono">ABLE CITY VIRTUAL METAVERSE</span>
+                    <span className="text-xs font-black text-amber-400">قول اهدای قطعه در شهر کاملاً مجازی توانا</span>
                   </div>
                   <span className="px-3 py-1 rounded-full bg-sky-950/80 border border-sky-400/50 text-sky-300 font-bold text-[11px] flex items-center gap-1.5">
                     <span>🌐</span>
-                    <span>{lang === 'fa' ? 'شهر کاملاً مجازی • بدون ادعای سند فیزیکی' : 'Purely Virtual World • No Physical Deed'}</span>
+                    <span>{lang === 'fa' ? 'شهر کاملاً مجازی • بدون وجود ملکی واقعی' : 'Purely Virtual World • No Physical Deed'}</span>
                   </span>
                   <div className="text-left font-mono text-[10px] text-stone-400">
                     RESERVE ID: ABLE-VIRTUAL-{referralCode}
                   </div>
                 </div>
 
-                <div className="py-2">
+                <div className="text-center py-1">
                   <h3 className="text-lg sm:text-2xl font-black text-[#f0c04a] tracking-wide">
                     {lang === 'fa'
                       ? 'لوح تعهد و قول اهدای قطعه در شهر مجازی توانا (Able City)'
@@ -1001,71 +1001,112 @@ export const AmbassadorLoyaltyModal: React.FC<AmbassadorLoyaltyModalProps> = ({
                   </h3>
                   <p className="text-xs text-stone-300 mt-2 max-w-2xl mx-auto leading-relaxed">
                     {lang === 'fa'
-                      ? 'شهر توانا (Able City) یک شهر و متاورس کاملاً مجازی در دنیای بازی همجهان است و در عالم واقعیت وجود خارجی ندارد. ما به صدرنشینان شطرنج و یاران وفادار قول می‌دهیم که به عنوان پاداش وفاداری، قطعه زمین مجازی در این شهر هوشمند به آنها اهدا شود و این لوح، نشان رزرو قطعه مجازی شماست.'
-                      : 'Able City is a purely virtual metaverse within the Worldplay game world with no physical real-world land. We pledge to allocate virtual land parcels in this digital smart city to our top leaders and faithful ambassadors.'}
+                      ? 'شهر توانا یک شهر کاملاً مجازی به وسعت ۱,۳۰۰,۰۰۰ متر مربع متشکل از دو شهر «همراز» و «آفرینا» است. این شهر دنیای مجازی اکوسیستم ۳۵ برنامه‌ای ماست و در عالم واقعیت وجود ملکی یا سند تک‌برگ ندارد. ما به همراهان و صدرنشینان برنامه قول داده و متعهد می‌شویم که قطعات زمین مجازی این شهر هوشمند را به صورت رایگان به آنها اهدا کنیم.'
+                      : 'Able City is a 1,300,000 m² virtual metaverse comprising twin cities "Hamraz" and "Afrena", part of an ecosystem of 35 applications with no real-world land or physical deeds.'}
                   </p>
                 </div>
 
-                {/* Specs Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs text-right bg-[#130f0c] p-3.5 rounded-2xl border border-[#5a4630]/50 font-sans">
-                  <div>
-                    <span className="text-[10px] text-stone-500 block uppercase font-bold">
-                      {lang === 'fa' ? 'کاربر ذی‌نفع' : 'Honored Player'}
-                    </span>
-                    <span className="font-extrabold text-amber-300">{googleUser?.name || playerName}</span>
+                {/* Twin Cities Specification Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-[#130f0c] p-4 rounded-2xl border border-[#5a4630]/60">
+                  <div className="p-3 rounded-xl bg-[#1d1611] border border-amber-500/30 text-right">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-extrabold text-amber-300 text-xs">شهر مجازی همراز</span>
+                      <span className="text-base">🏰</span>
+                    </div>
+                    <div className="text-stone-300 text-[11px]">وسعت: <strong className="text-amber-400 font-mono">۶۵۰,۰۰۰ متر مربع</strong></div>
+                    <div className="text-[10px] text-stone-400 mt-0.5">مرکز تمدن، تاریخ و دانشگاه شطرنج</div>
                   </div>
-                  <div>
-                    <span className="text-[10px] text-stone-500 block uppercase font-bold">
-                      {lang === 'fa' ? 'سهمیه در شهر مجازی' : 'Virtual Plot Size'}
-                    </span>
-                    <span className="font-extrabold text-emerald-400">۵۰۰ واحد مجازی</span>
+
+                  <div className="p-3 rounded-xl bg-[#1d1611] border border-amber-500/30 text-right">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-extrabold text-amber-300 text-xs">شهر مجازی آفرینا</span>
+                      <span className="text-base">🌆</span>
+                    </div>
+                    <div className="text-stone-300 text-[11px]">وسعت: <strong className="text-amber-400 font-mono">۶۵۰,۰۰۰ متر مربع</strong></div>
+                    <div className="text-[10px] text-stone-400 mt-0.5">پردیس فناوری، تجارت دیجیتال و ارتباطات</div>
                   </div>
-                  <div>
-                    <span className="text-[10px] text-stone-500 block uppercase font-bold">
-                      {lang === 'fa' ? 'کاربری مجازی' : 'Virtual District'}
-                    </span>
-                    <span className="font-extrabold text-stone-200">پردیس دانایی و فرهنگ شطرنج</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-stone-500 block uppercase font-bold">
-                      {lang === 'fa' ? 'وضعیت تعهد' : 'Pledge Status'}
-                    </span>
-                    <span className="font-extrabold text-sky-400">قول قطعی اهدای مجازی</span>
+
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-amber-950/40 to-[#1d1611] border border-amber-400/50 text-right">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-extrabold text-emerald-300 text-xs">مجموع کل شهر توانا</span>
+                      <span className="text-base">💎</span>
+                    </div>
+                    <div className="text-stone-200 text-[11px]">مساحت: <strong className="text-emerald-400 font-mono">۱,۳۰۰,۰۰۰ متر مربع</strong></div>
+                    <div className="text-[10px] text-stone-300 mt-0.5">شامل <strong>۳۵ برنامه</strong> اکوسیستم متصل</div>
                   </div>
                 </div>
 
-                {/* Clear Transparency Callout */}
-                <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-500/40 text-right text-xs flex items-start gap-2.5">
-                  <span className="text-base">🤝</span>
+                {/* 2-Phase Strategic Milestone Roadmap */}
+                <div className="space-y-2 text-right">
+                  <h4 className="font-extrabold text-amber-300 text-xs uppercase flex items-center gap-1.5 justify-end">
+                    <span>نقشه راه و چشم‌انداز ۲ فازی توسعه شهر مجازی توانا</span>
+                    <Sparkles size={14} className="text-amber-400" />
+                  </h4>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    {/* Phase 1 */}
+                    <div className="p-3.5 rounded-2xl bg-[#18130e] border border-sky-500/40 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold text-[10px] border border-sky-400/40">
+                          فاز ۱: ۱۰,۰۰۰+ دانلود برنامه
+                        </span>
+                        <span className="text-sky-400 font-mono font-bold text-xs">Phase 1</span>
+                      </div>
+                      <h5 className="font-black text-stone-100 text-xs">معرفی ارز داخلی و گیم اختصاصی</h5>
+                      <p className="text-[11px] text-stone-300 leading-relaxed">
+                        پس از رسیدن مجموع دانلود برنامه‌ها به بیش از ۱۰,۰۰۰ نوبت، ارز داخلی اکوسیستم و گیم اولیه/داخلی برنامه رسماً معرفی و فعال خواهد شد.
+                      </p>
+                    </div>
+
+                    {/* Phase 2 */}
+                    <div className="p-3.5 rounded-2xl bg-[#18130e] border border-amber-500/50 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] border border-amber-400/40">
+                          فاز ۲: ۵۰,۰۰۰+ دانلود + ۶۰٪ واگذاری زمین
+                        </span>
+                        <span className="text-amber-400 font-mono font-bold text-xs">Phase 2</span>
+                      </div>
+                      <h5 className="font-black text-stone-100 text-xs">ارز دیجیتال جهانی + گیم سه‌بعدی (3D Metaverse)</h5>
+                      <p className="text-[11px] text-stone-300 leading-relaxed">
+                        پس از ۵۰,۰۰۰ دانلود و واگذاری ۶۰ درصد از زمین‌های مجازی، ارز دیجیتال جهانی اکوسیستم معرفی گشته و گیم سه‌بعدی کامل شهر توانا رونمایی می‌شود.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Honest & Transparent Disclaimer */}
+                <div className="p-3.5 rounded-2xl bg-amber-950/30 border border-amber-500/40 text-right text-xs flex items-start gap-2.5">
+                  <span className="text-xl shrink-0 mt-0.5">🤝</span>
                   <div className="leading-relaxed text-stone-300 text-[11px]">
                     <strong className="text-amber-300 block mb-0.5 font-bold">
-                      {lang === 'fa' ? 'تعهد و شفافیت کامل ما با شما:' : 'Our Honest Pledge:'}
+                      {lang === 'fa' ? 'شفافیت و صداقت کامل در تعهد به شما:' : 'Our Clear Pledge:'}
                     </strong>
                     {lang === 'fa'
-                      ? 'ما هیچ ادعای کذب یا وعده سند ملکی در دنیای واقعی نمی‌دهیم. شهر توانا یک شهر مجازی نوآورانه درون این برنامه است که با راه‌اندازی فاز آنلاین آن، این زمین مجازی به صورت رایگان به شما اهدا خواهد شد.'
-                      : 'We make no claims of physical real-estate. Able City is an innovative in-game virtual metropolis where your virtual plot will be officially granted upon the online world phase launch.'}
+                      ? 'ما هیچ ادعا یا ادعای سند تک‌برگ یا ملک واقعی در عالم دنیوی نمی‌کنیم. شهر توانا یک شهر کاملاً مجازی و شبیه‌سازی‌شده است و ما با قول صادقانه، قطعه زمین مجازی شما را در زمان راه‌اندازی گیم سه‌بعدی به شما اهدا خواهیم نمود.'
+                      : 'We make no claims of physical real-estate or deeds. Able City is a purely virtual simulation where your virtual plot will be officially granted upon full metaverse launch.'}
                   </div>
                 </div>
 
+                {/* Action Buttons */}
                 <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
                   <button
                     onClick={() => {
-                      alert(lang === 'fa' ? 'قول و رزرو اهدای قطعه مجازی شهر توانا برای شما در حساب کاربری‌تان ثبت شد.' : 'Virtual land reservation saved to your profile.');
+                      alert(lang === 'fa' ? 'قول و رزرو قطعه زمین مجازی شما در شهر توانا به وسعت ۵۰۰ واحد مجازی با موفقیت ثبت شد.' : 'Virtual land reservation saved to your profile.');
                     }}
                     className="py-2.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-stone-900 font-black text-xs shadow-md transition-all cursor-pointer flex items-center gap-2"
                   >
                     <Check size={15} />
-                    <span>{lang === 'fa' ? 'ثبت و ذخیره قول اهدای قطعه مجازی' : 'Confirm Virtual Reservation'}</span>
+                    <span>{lang === 'fa' ? 'ثبت و دریافت لوح قول اهدای قطعه مجازی' : 'Confirm Virtual Land Reservation'}</span>
                   </button>
 
                   <button
                     onClick={() => {
-                      alert(lang === 'fa' ? 'نقشه شماتیک شهر مجازی توانا: پردیس شطرنج همجهان در بخش نوآوری دیجیتال واقع شده است.' : 'Able City Virtual Schematic Map: Chess campus is located in digital innovation sector.');
+                      alert(lang === 'fa' ? 'نقشه شماتیک شهر توانا: شهر همراز (۶۵۰ هزار م.م) و شهر آفرینا (۶۵۰ هزار م.م) - مجموع ۱.۳ میلیون متر مربع مجازی.' : 'Able City Virtual Schematic: Hamraz & Afrena Twin Cities (1.3M sqm).');
                     }}
                     className="py-2.5 px-5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 font-bold text-xs border border-stone-600 transition-colors cursor-pointer flex items-center gap-1.5"
                   >
                     <MapPin size={15} />
-                    <span>{lang === 'fa' ? 'مشاهده نقشه شماتیک شهر مجازی توانا' : 'View Virtual Able City Map'}</span>
+                    <span>{lang === 'fa' ? 'مشاهده نقشه دو شهر مجازی همراز و آفرینا' : 'View Twin Virtual Cities Map'}</span>
                   </button>
                 </div>
               </div>
