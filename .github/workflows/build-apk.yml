@@ -40,8 +40,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 5. Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: 5. Accept Android SDK Licenses & Configure Environment
+        run: |
+          mkdir -p "$ANDROID_HOME/licenses"
+          echo -e "\n8933011224571460b53530110012a3e05d69d3f1\nd56f5187479451eabf01fb78af6dfcb131a6481e\n24333f8a63718c15525996be8863422264ae0686\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-license"
+          echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
+          if [ -d "$ANDROID_HOME/cmdline-tools/latest/bin" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
+          fi
 
       - name: 6. Set up Gradle 8.5
         uses: gradle/actions/setup-gradle@v3
@@ -82,13 +88,13 @@ jobs:
           fi
           echo "KEYSTORE_PATH=release.keystore" >> $GITHUB_ENV
 
-      - name: 8. Build Signed Release APK
+      - name: 9. Build Signed Release APK
         run: ./gradlew assembleRelease --stacktrace
 
-      - name: 9. Build Signed Release AAB (Google Play / Bazaar Bundle)
+      - name: 10. Build Signed Release AAB (Google Play / Bazaar Bundle)
         run: ./gradlew bundleRelease --stacktrace
 
-      - name: 10. Locate Artifact Files
+      - name: 11. Locate Artifact Files
         id: find_files
         run: |
           APK_FILE=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
@@ -98,7 +104,7 @@ jobs:
           echo "apk_path=$APK_FILE" >> $GITHUB_OUTPUT
           echo "aab_path=$AAB_FILE" >> $GITHUB_OUTPUT
 
-      - name: 11. Upload Release APK Artifact
+      - name: 12. Upload Release APK Artifact
         uses: actions/upload-artifact@v4
         if: steps.find_files.outputs.apk_path != ''
         with:
@@ -106,7 +112,7 @@ jobs:
           path: ${{ steps.find_files.outputs.apk_path }}
           retention-days: 30
 
-      - name: 12. Upload Release AAB (Bundle) Artifact
+      - name: 13. Upload Release AAB (Bundle) Artifact
         uses: actions/upload-artifact@v4
         if: steps.find_files.outputs.aab_path != ''
         with:
@@ -114,7 +120,7 @@ jobs:
           path: ${{ steps.find_files.outputs.aab_path }}
           retention-days: 30
 
-      - name: 13. Create Automatic GitHub Release (Direct Download APK & AAB)
+      - name: 14. Create Automatic GitHub Release (Direct Download APK & AAB)
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         with:
