@@ -49,6 +49,8 @@ import { VictoryCardModal } from './components/VictoryCardModal.tsx';
 import { MythicCampaignModal, MythicScenario } from './components/MythicCampaignModal.tsx';
 import { OnboardingModal } from './components/OnboardingModal.tsx';
 import { FairPlayModal } from './components/FairPlayModal.tsx';
+import { PromoVideoModal } from './components/PromoVideoModal.tsx';
+import { CreditRepairModal } from './components/CreditRepairModal.tsx';
 import { CIVILIZATIONS } from './utils/civilizations.ts';
 import {
   RotateCcw,
@@ -69,7 +71,9 @@ import {
   HelpCircle,
   ShieldCheck,
   ShieldAlert,
-  Share2
+  Share2,
+  Film,
+  CreditCard
 } from 'lucide-react';
 
 const BOOSTERS_CONFIG: Record<BoosterTier, number> = {
@@ -132,6 +136,8 @@ export default function App() {
   const [showCampaign, setShowCampaign] = useState<boolean>(false);
   const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
   const [showFairPlay, setShowFairPlay] = useState<boolean>(false);
+  const [showPromoVideo, setShowPromoVideo] = useState<boolean>(false);
+  const [showCreditRepair, setShowCreditRepair] = useState<boolean>(false);
   const [activePresenceSeconds, setActivePresenceSeconds] = useState<number>(0);
   const [loyaltyToast, setLoyaltyToast] = useState<{ message: string; exp: number } | null>(null);
   const [clashSquare, setClashSquare] = useState<Square | null>(null);
@@ -891,6 +897,19 @@ export default function App() {
               </span>
             </button>
 
+            {/* 30-Second Aparat & Cafe Bazaar Promo Video Studio Button */}
+            <button
+              onClick={() => setShowPromoVideo(true)}
+              className="p-1.5 px-2 rounded-lg bg-gradient-to-r from-rose-950/80 to-amber-950/80 hover:from-rose-900 hover:to-amber-900 border border-amber-500/70 text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+              title={lang === 'fa' ? 'استودیوی تیزر ۳۰ ثانیه‌ای آپارات و کافه بازار' : '30s Aparat & Cafe Bazaar Promo Studio'}
+              aria-label="Promo Video Studio"
+            >
+              <Film size={15} className="text-amber-400" />
+              <span className="font-bold text-xs hidden sm:inline">
+                {lang === 'fa' ? 'تیزر بازار & آپارات' : 'Bazaar Teaser'}
+              </span>
+            </button>
+
             {/* Leagues Button (Chess ELO & Rating) */}
             <button
               onClick={() => setShowLeague(true)}
@@ -940,6 +959,19 @@ export default function App() {
             >
               <Coins size={16} />
               <span className="font-mono text-xs hidden sm:inline">{coins}</span>
+            </button>
+
+            {/* Financial Wisdom & US/Canada Credit Repair Button */}
+            <button
+              onClick={() => setShowCreditRepair(true)}
+              className="p-1.5 px-2 rounded-lg bg-gradient-to-r from-emerald-950/90 to-teal-950/90 hover:from-emerald-900 hover:to-teal-900 border border-emerald-500/70 text-emerald-300 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+              title={lang === 'fa' ? 'دانستنی‌های ترمیم کردیت کارت خراب در آمریکا و کانادا' : 'US/Canada Credit Repair & Finance Guide'}
+              aria-label="Credit Repair Guide"
+            >
+              <CreditCard size={15} className="text-emerald-400" />
+              <span className="font-bold text-xs hidden lg:inline">
+                {lang === 'fa' ? 'ترمیم کردیت آمریکا' : 'Credit Repair'}
+              </span>
             </button>
 
             {/* Social Rewards & Promo Codes Button */}
@@ -1447,6 +1479,7 @@ export default function App() {
         onClose={() => setShowAcademy(false)}
         t={t}
         lang={lang}
+        onAddCoins={handleAddCoins}
       />
 
       {/* League & Leaderboard Modal */}
@@ -1599,6 +1632,27 @@ export default function App() {
               return updated;
             });
           }
+        }}
+        lang={lang}
+      />
+
+      {/* 30-Second Aparat & Cafe Bazaar Promo Video Studio Modal */}
+      <PromoVideoModal
+        isOpen={showPromoVideo}
+        onClose={() => setShowPromoVideo(false)}
+        lang={lang}
+      />
+
+      {/* Financial Wisdom & US/Canada Credit Repair Guide Modal */}
+      <CreditRepairModal
+        isOpen={showCreditRepair}
+        onClose={() => setShowCreditRepair(false)}
+        onAddCoins={(amount) => {
+          setCoins(prev => {
+            const updated = prev + amount;
+            localStorage.setItem('worldplay_coins', String(updated));
+            return updated;
+          });
         }}
         lang={lang}
       />

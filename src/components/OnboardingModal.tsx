@@ -143,6 +143,16 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     ? 'Омезиши беназири шоҳмот бо фарҳанги Ҳахоманишӣ, давлати Сомониёни Бухоро (Тоҷикистон ва Ӯзбекистон), Акбаршоҳи Ҳинд ва филиззоти кимиёӣ.'
                     : 'A fusion of strategic chess with Achaemenid Persia, Samanid Bukhara (Tajikistan & Uzbekistan), Mughal India, and the 6 alchemical metals.'}
                 </p>
+
+                {/* Creator Credits & Google AI Studio Partnership Banner */}
+                <div className="p-3 bg-gradient-to-r from-amber-950/80 via-[#261c14] to-amber-950/80 border border-amber-500/60 rounded-xl space-y-1 text-xs text-center shadow-md my-2">
+                  <div className="font-black text-amber-300">
+                    👑 طراح و ایده‌پرداز برنامه: جناب آقای اکبر علیمیری
+                  </div>
+                  <p className="text-[11px] text-stone-300 leading-relaxed">
+                    با سپاس و قدردانی فراوان از همراهی و همکاری بسیار ارزشمند کمپانی معظم <strong className="text-amber-400">گوگل ای‌آی استودیو (Google AI Studio)</strong>
+                  </p>
+                </div>
               </div>
 
               {/* Showcase Grid of Pieces */}

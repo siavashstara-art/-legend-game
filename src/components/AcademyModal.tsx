@@ -7,6 +7,7 @@ interface AcademyModalProps {
   onClose: () => void;
   t: TranslationDictionary;
   lang: Language;
+  onAddCoins?: (amount: number) => void;
 }
 
 export const AcademyModal: React.FC<AcademyModalProps> = ({
@@ -14,10 +15,27 @@ export const AcademyModal: React.FC<AcademyModalProps> = ({
   onClose,
   t,
   lang,
+  onAddCoins,
 }) => {
   const [activeTab, setActiveTab] = useState<'beginner' | 'pro' | 'ultra' | 'philosophy'>('beginner');
+  const [claimedLessons, setClaimedLessons] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('worldplay_claimed_lessons') || '[]');
+    } catch {
+      return [];
+    }
+  });
 
   if (!isOpen) return null;
+
+  const handleClaimReward = (lessonKey: string) => {
+    if (claimedLessons.includes(lessonKey)) return;
+    const updated = [...claimedLessons, lessonKey];
+    setClaimedLessons(updated);
+    localStorage.setItem('worldplay_claimed_lessons', JSON.stringify(updated));
+    if (onAddCoins) onAddCoins(100);
+    alert(lang === 'fa' ? 'پاداش ۱۰۰ دریک زرین بابت تکمیل درس به حساب شما واریز شد!' : '100 Golden Darics credited for completing lesson!');
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in duration-150">
@@ -186,6 +204,24 @@ export const AcademyModal: React.FC<AcademyModalProps> = ({
                     ? '«همجهان» یک بازی برای نابودی فیزیکی نیست؛ دعوتی است به زیستِ مسالمت‌آمیز از خلال بازی فکری. منشور کوروش بزرگ در پاسارگاد نخستین سند کرامت انسانی و صلح در جهان است. ما در این برنامه با تلفیق هنر هخامنشی و قوانین پویای زمان، تجلی این اندیشه را بازآفریده‌ایم.'
                     : '"Worldplay" is not designed for physical annihilation; it is an open invitation to peaceful coexistence through intellectual duel. The Cyrus Cylinder stands as humanity’s premier charter of human dignity and peace. In this game, we unite Achaemenid heritage with dynamic speed rules to celebrate this timeless legacy.'}
                 </p>
+              </div>
+              <div className="pt-2">
+                <button
+                  onClick={() => handleClaimReward(`academy_${activeTab}`)}
+                  disabled={claimedLessons.includes(`academy_${activeTab}`)}
+                  className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 ${
+                    claimedLessons.includes(`academy_${activeTab}`)
+                      ? 'bg-stone-800 text-stone-500 border border-stone-700 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-stone-900 border border-amber-400 cursor-pointer animate-pulse'
+                  }`}
+                >
+                  <Sparkles size={15} />
+                  <span>
+                    {claimedLessons.includes(`academy_${activeTab}`)
+                      ? (lang === 'fa' ? '✓ پاداش ۱۰۰ دریک این درس دریافت شد' : '✓ Lesson Reward Claimed (100 Darics)')
+                      : (lang === 'fa' ? 'تکمیل خواندن درس و دریافت ۱۰۰ دریک زرین هدیه' : 'Complete Lesson & Claim 100 Darics')}
+                  </span>
+                </button>
               </div>
             </div>
           )}

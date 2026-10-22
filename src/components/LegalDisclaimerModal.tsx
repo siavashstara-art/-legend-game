@@ -47,6 +47,19 @@ export const LegalDisclaimerModal: React.FC<LegalDisclaimerModalProps> = ({
             {t.officialDisclaimerText}
           </div>
 
+          {/* Official Creator Credits & Google AI Studio Partnership Box */}
+          <div className="p-3.5 bg-gradient-to-r from-amber-950/80 via-[#2a1e16] to-amber-950/80 border border-amber-500/60 rounded-xl space-y-1.5 shadow-md">
+            <div className="text-xs sm:text-sm font-black text-amber-300 flex items-center justify-between flex-wrap gap-1">
+              <span>👑 طراح و ایده‌پرداز اثر: جناب آقای اکبر علیمیری</span>
+              <span className="text-[10px] font-mono text-amber-200/80">Lead Designer: Mr. Akbar Alimiri</span>
+            </div>
+            <p className="text-[11px] sm:text-xs text-stone-200 leading-relaxed pt-1 border-t border-amber-500/30">
+              {lang === 'fa'
+                ? 'ضمن قدردانی و سپاس ویژه از همراهی، تکنولوژی پیشرفته و همکاری بسیار ارزشمند کمپانی معظم «گوگل ای‌آی استودیو» (Google AI Studio) در خلق این شاهکار نوآورانه.'
+                : 'With sincere gratitude and appreciation for the invaluable partnership, technology, and collaboration of Google AI Studio in building this innovative masterpiece.'}
+            </p>
+          </div>
+
           <div className="space-y-2 text-xs text-stone-400">
             <div className="flex items-start gap-2">
               <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
@@ -62,6 +75,14 @@ export const LegalDisclaimerModal: React.FC<LegalDisclaimerModalProps> = ({
                 {lang === 'fa'
                   ? 'تمامی حقوق معنوی هویت بصری، کارت‌ها و نام «همجهان» محفوظ است.'
                   : 'All intellectual property and artistic representations of Worldplay are preserved.'}
+              </span>
+            </div>
+            <div className="flex items-start gap-2">
+              <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+              <span>
+                {lang === 'fa'
+                  ? 'پرسش: ارتباط شطرنج و سواد مالی؟ تمرکز استراتژیک در شطرنج نیازمند آرامش ذهن و فراغت بال از دغدغه‌های مالی است؛ لذا بخش سواد مالی هدیه‌ای برای ایجاد آرامش خاطر بازیکنان است.'
+                  : 'Q: Why Financial Literacy in Chess? Strategic focus requires mental tranquility free from financial stress, so players can enjoy gaming with complete peace of mind.'}
               </span>
             </div>
           </div>

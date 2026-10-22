@@ -48,8 +48,12 @@ jobs:
         with:
           gradle-version: '8.5'
 
-      - name: 7. Make Gradle Wrapper Executable
-        run: chmod +x gradlew
+      - name: 7. Provision Gradle Wrapper Jar & Make Executable
+        run: |
+          if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+            gradle wrapper --gradle-version 8.5
+          fi
+          chmod +x gradlew
 
       - name: 8. Generate Production Keystore (Automated Fallback)
         run: |
