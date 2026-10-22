@@ -40,16 +40,18 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 5. Set up Gradle
+      - name: 5. Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 6. Set up Gradle 8.5
         uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
 
-      - name: 6. Setup Gradle Wrapper & Accept Licenses
-        run: |
-          yes | sdkmanager --licenses || true
-          gradle wrapper --gradle-version 7.5.1
-          chmod +x gradlew
+      - name: 7. Make Gradle Wrapper Executable
+        run: chmod +x gradlew
 
-      - name: 7. Generate Production Keystore (Automated Fallback)
+      - name: 8. Generate Production Keystore (Automated Fallback)
         run: |
           mkdir -p app
           if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
