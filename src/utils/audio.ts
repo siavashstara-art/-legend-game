@@ -103,7 +103,7 @@ export function playCheckSound(muted: boolean = false): void {
   }
 }
 
-export function playBoosterSound(tier: 'bronze' | 'silver' | 'gold' | 'platinum', muted: boolean = false): void {
+export function playBoosterSound(tier: 'bronze' | 'silver' | 'gold' | 'platinum' = 'gold', muted: boolean = false): void {
   if (muted) return;
   const ctx = getAudioContext();
   if (!ctx) return;

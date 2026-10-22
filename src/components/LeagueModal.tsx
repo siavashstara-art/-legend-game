@@ -22,6 +22,7 @@ interface LeagueModalProps {
   playerName: string;
   t: TranslationDictionary;
   lang: Language;
+  onOpenAmbassadorModal?: () => void;
 }
 
 export const LeagueModal: React.FC<LeagueModalProps> = ({
@@ -32,6 +33,7 @@ export const LeagueModal: React.FC<LeagueModalProps> = ({
   playerName,
   t,
   lang,
+  onOpenAmbassadorModal
 }) => {
   const [leagues, setLeagues] = useState<LeagueTier[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -110,6 +112,32 @@ export const LeagueModal: React.FC<LeagueModalProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Ambassador & Loyalty League Cross-Link Banner */}
+        {onOpenAmbassadorModal && (
+          <div className="p-3 bg-gradient-to-r from-amber-950/60 via-[#271d15] to-[#1a140f] border-b border-[#5a4630] flex items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🏛️</span>
+              <div>
+                <span className="font-extrabold text-amber-300 block">
+                  {lang === 'fa' ? 'لیگ معرفان و وفاداران • هیئت امنا و شهر توانا' : 'Ambassador & Loyalty League • Able City'}
+                </span>
+                <span className="text-[10px] text-stone-400">
+                  {lang === 'fa' ? 'امتیازدهی مجزا با کد معرف، حضور روزانه و هر دقیقه در بازی' : 'Earn separate EXP via referral code, daily logins & minutes in app'}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                onClose();
+                onOpenAmbassadorModal();
+              }}
+              className="py-1 px-3 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-stone-900 font-extrabold text-[11px] shadow transition-colors cursor-pointer whitespace-nowrap"
+            >
+              {lang === 'fa' ? 'ورود به لیگ معرفان ➔' : 'Open League ➔'}
+            </button>
+          </div>
+        )}
 
         {/* Content: League Tiers & Leaderboard */}
         <div className="p-4 sm:p-5 overflow-y-auto space-y-5 text-xs text-stone-200">

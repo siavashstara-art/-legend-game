@@ -17,19 +17,22 @@ android {
 
     signingConfigs {
         release {
-            def keystoreFile = file(System.getenv("KEYSTORE_PATH") ?: "release.keystore")
+            def kPath = System.getenv("KEYSTORE_PATH") ?: "release.keystore"
+            def keystoreFile = file(kPath)
+            if (!keystoreFile.exists()) {
+                keystoreFile = file("${rootDir}/${kPath}")
+            }
+            if (!keystoreFile.exists()) {
+                keystoreFile = file("${projectDir}/${kPath}")
+            }
             if (keystoreFile.exists()) {
                 storeFile keystoreFile
                 storePassword System.getenv("KEYSTORE_PASSWORD") ?: "worldplay123"
                 keyAlias System.getenv("KEY_ALIAS") ?: "worldplay"
                 keyPassword System.getenv("KEY_PASSWORD") ?: "worldplay123"
-            } else {
-                // Safe fallback to debug signature if custom keystore has not been provisioned yet
-                storeFile file("${System.getProperty('user.home')}/.android/debug.keystore")
-                storePassword "android"
-                keyAlias "androiddebugkey"
-                keyPassword "android"
             }
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
 

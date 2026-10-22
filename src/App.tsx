@@ -39,6 +39,7 @@ import { PromotionModal } from './components/PromotionModal.tsx';
 import { GameOverModal } from './components/GameOverModal.tsx';
 import { AcademyModal } from './components/AcademyModal.tsx';
 import { LeagueModal } from './components/LeagueModal.tsx';
+import { AmbassadorLoyaltyModal } from './components/AmbassadorLoyaltyModal.tsx';
 import { TreasuryModal } from './components/TreasuryModal.tsx';
 import { LegalDisclaimerModal } from './components/LegalDisclaimerModal.tsx';
 import { CommunityRewardModal } from './components/CommunityRewardModal.tsx';
@@ -67,7 +68,8 @@ import {
   Swords,
   HelpCircle,
   ShieldCheck,
-  ShieldAlert
+  ShieldAlert,
+  Share2
 } from 'lucide-react';
 
 const BOOSTERS_CONFIG: Record<BoosterTier, number> = {
@@ -93,7 +95,7 @@ export default function App() {
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [enableMetallurgy, setEnableMetallurgy] = useState<boolean>(() => {
-    return localStorage.getItem('worldplay_enable_metallurgy') === 'true';
+    return localStorage.getItem('worldplay_enable_metallurgy') !== 'false';
   });
 
   const handleToggleMetallurgy = () => {
@@ -120,6 +122,7 @@ export default function App() {
   // Modal Dialogs
   const [showAcademy, setShowAcademy] = useState<boolean>(false);
   const [showLeague, setShowLeague] = useState<boolean>(false);
+  const [showAmbassador, setShowAmbassador] = useState<boolean>(false);
   const [showTreasury, setShowTreasury] = useState<boolean>(false);
   const [showDisclaimer, setShowDisclaimer] = useState<boolean>(false);
   const [showCommunity, setShowCommunity] = useState<boolean>(false);
@@ -127,17 +130,22 @@ export default function App() {
   const [showAndroidModal, setShowAndroidModal] = useState<boolean>(false);
   const [showVictoryCard, setShowVictoryCard] = useState<boolean>(false);
   const [showCampaign, setShowCampaign] = useState<boolean>(false);
-  const [showOnboarding, setShowOnboarding] = useState<boolean>(() => {
-    return localStorage.getItem('worldplay_onboarding_completed') !== 'true';
-  });
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
   const [showFairPlay, setShowFairPlay] = useState<boolean>(false);
+  const [activePresenceSeconds, setActivePresenceSeconds] = useState<number>(0);
+  const [loyaltyToast, setLoyaltyToast] = useState<{ message: string; exp: number } | null>(null);
   const [clashSquare, setClashSquare] = useState<Square | null>(null);
   const [gameStartTime, setGameStartTime] = useState<number>(() => Date.now());
   const [gameWinner, setGameWinner] = useState<Color>('w');
   const [aiTip, setAiTip] = useState<string | null>(null);
   const [loadingAiTip, setLoadingAiTip] = useState<boolean>(false);
   const [is3D, setIs3D] = useState<boolean>(() => {
-    return localStorage.getItem('worldplay_is3d') === 'true';
+    const saved = localStorage.getItem('worldplay_is3d_v2');
+    if (saved === null) {
+      localStorage.setItem('worldplay_is3d_v2', 'true');
+      return true;
+    }
+    return saved === 'true';
   });
 
   // VIP In-Game Perks unlocked via Socials
@@ -199,6 +207,75 @@ export default function App() {
       const idx = langs.indexOf(prev);
       return langs[(idx + 1) % langs.length];
     });
+  };
+
+  // Active Presence Timer: 1 Minute in app = 1 EXP in Ambassador League
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActivePresenceSeconds(prev => {
+        const next = prev + 1;
+        if (next > 0 && next % 60 === 0) {
+          const currentExp = parseInt(localStorage.getItem('worldplay_loyalty_exp') || '1200', 10);
+          const currentMins = parseInt(localStorage.getItem('worldplay_active_minutes') || '45', 10);
+          const updatedExp = currentExp + 1;
+          const updatedMins = currentMins + 1;
+          localStorage.setItem('worldplay_loyalty_exp', String(updatedExp));
+          localStorage.setItem('worldplay_active_minutes', String(updatedMins));
+
+          // Background sync to server
+          fetch('/api/loyalty/track-minute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              playerName,
+              minutesToAdd: 1
+            })
+          }).catch(() => {});
+        }
+        return next;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [playerName]);
+
+  // Handle Social Sharing with Instant EXP Reward
+  const handleSocialShareWithReward = async () => {
+    const referralCode = localStorage.getItem('worldplay_referral_code') || 'HAM-PARS-7842';
+    const shareUrl = `https://worldplay.app/?ref=${referralCode}`;
+    const shareText = `👑 به بازی همجهان شطرنج ۳ بعدی بپیوندید! با کد معرف من [${referralCode}]، ۱۰۰ دریک زرین + ۴۰۰ امتیاز وفاداری هدیه بگیرید و قطعه زمین رایگان در شهر توانا (Able City) دریافت کنید!`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'همجهان شطرنج • لیگ معرفان و شهر توانا',
+          text: shareText,
+          url: shareUrl
+        });
+      } catch {
+        // User cancelled
+      }
+    } else {
+      navigator.clipboard?.writeText(`${shareText}\n${shareUrl}`);
+      const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
+      window.open(tgUrl, '_blank');
+    }
+
+    // Award instant +250 EXP and +50 Darics!
+    const currentExp = parseInt(localStorage.getItem('worldplay_loyalty_exp') || '1200', 10);
+    const updatedExp = currentExp + 250;
+    localStorage.setItem('worldplay_loyalty_exp', String(updatedExp));
+    handleAddCoins(50);
+
+    setLoyaltyToast({
+      message: lang === 'fa' ? 'پاداش اشتراک‌گذاری اعمال شد! +۲۵۰ امتیاز EXP معرفان و +۵۰ دریک زرین' : 'Social Share reward claimed! +250 Ambassador EXP & +50 Darics',
+      exp: 250
+    });
+    setTimeout(() => setLoyaltyToast(null), 4000);
+
+    try {
+      playBoosterSound();
+    } catch {}
   };
 
   const totalAllowed = activeBooster ? BOOSTERS_CONFIG[activeBooster] : baseTurnSeconds;
@@ -814,14 +891,44 @@ export default function App() {
               </span>
             </button>
 
-            {/* Leagues Button */}
+            {/* Leagues Button (Chess ELO & Rating) */}
             <button
               onClick={() => setShowLeague(true)}
-              className="p-1.5 rounded-lg bg-[#241e19] hover:bg-[#342c24] border border-[#5a4630]/60 text-[#f0c04a] transition-colors cursor-pointer"
+              className="p-1.5 px-2 rounded-lg bg-[#241e19] hover:bg-[#342c24] border border-[#5a4630]/60 text-[#f0c04a] transition-colors cursor-pointer flex items-center gap-1.5"
               title={t.league}
               aria-label={t.league}
             >
               <Trophy size={16} />
+              <span className="font-bold text-xs hidden sm:inline">
+                {lang === 'fa' ? 'لیگ شطرنج' : 'Chess League'}
+              </span>
+            </button>
+
+            {/* Ambassador & Loyalty League (Able City & Trustees) Button */}
+            <button
+              onClick={() => setShowAmbassador(true)}
+              className="p-1.5 px-2.5 rounded-lg bg-gradient-to-r from-amber-950/80 via-[#2a1e15] to-[#1d1610] hover:from-amber-900 hover:to-[#251d16] border border-amber-500/70 text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+              title={lang === 'fa' ? 'لیگ معرفان و وفاداران • شهر توانا و هیئت امنا' : 'Ambassador & Loyalty League • Able City'}
+              aria-label="Ambassador & Loyalty League"
+            >
+              <span className="text-sm">🏛️</span>
+              <span className="font-bold text-xs hidden sm:inline">
+                {lang === 'fa' ? 'لیگ معرفان و شهر توانا' : 'Ambassadors'}
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping hidden md:inline-block" />
+            </button>
+
+            {/* Instant Social Share for EXP Button */}
+            <button
+              onClick={handleSocialShareWithReward}
+              className="p-1.5 px-2 rounded-lg bg-gradient-to-r from-emerald-950/80 to-teal-950/80 hover:from-emerald-900 hover:to-teal-900 border border-emerald-500/60 text-emerald-300 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+              title={lang === 'fa' ? 'اشتراک‌گذاری در شبکه‌ها و دریافت آنی +۲۵۰ EXP' : 'Share to Social & Claim +250 EXP'}
+              aria-label="Share to Social"
+            >
+              <Share2 size={14} className="text-emerald-400" />
+              <span className="font-black text-xs hidden md:inline">
+                {lang === 'fa' ? 'اشتراک (+۲۵۰ EXP)' : 'Share (+250)'}
+              </span>
             </button>
 
             {/* Treasury Shop Button */}
@@ -983,7 +1090,7 @@ export default function App() {
                 onClick={() => {
                   const newIs3D = !is3D;
                   setIs3D(newIs3D);
-                  localStorage.setItem('worldplay_is3d', String(newIs3D));
+                  localStorage.setItem('worldplay_is3d_v2', String(newIs3D));
                 }}
                 className={`w-full rounded-md p-1.5 text-xs font-bold transition-colors cursor-pointer border ${
                   is3D
@@ -1097,10 +1204,65 @@ export default function App() {
           enableMetallurgy={enableMetallurgy}
         />
 
+        {/* Quick 3D / 2D Perspective Switcher */}
+        <div className="flex items-center justify-between px-3 py-1.5 bg-[#1a1410] rounded-xl border border-amber-900/40 shadow-sm">
+          <div className="flex items-center gap-1.5 text-xs">
+            <Sparkles size={14} className="text-amber-400" />
+            <span className="text-stone-300 font-bold">
+              {lang === 'fa' ? 'حالت صفحه بازی:' : 'Board Perspective:'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1 p-0.5 bg-[#0e0c0a] rounded-lg border border-stone-800">
+            <button
+              type="button"
+              onClick={() => {
+                setIs3D(true);
+                localStorage.setItem('worldplay_is3d_v2', 'true');
+              }}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                is3D
+                  ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 shadow-md font-black ring-1 ring-amber-400'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              <span>🪐</span>
+              <span>{lang === 'fa' ? 'سه‌بعدی ۳D (پیش‌فرض)' : '3D Mode (Default)'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setIs3D(false);
+                localStorage.setItem('worldplay_is3d_v2', 'false');
+              }}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                !is3D
+                  ? 'bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 shadow-md font-black ring-1 ring-amber-400'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              <span>♟️</span>
+              <span>{lang === 'fa' ? 'دوبعدی ۲D' : '2D Mode'}</span>
+            </button>
+          </div>
+        </div>
+
         {/* Chess Board Container */}
         <div className="flex justify-center w-full">
           {is3D ? (
-            <ChessBoard3D theme={boardTheme} game={game} />
+            <ChessBoard3D
+              game={game}
+              selectedSquare={selectedSquare}
+              validTargets={validTargets}
+              lastMove={lastMove}
+              flipped={flipped}
+              theme={boardTheme}
+              enableMetallurgy={enableMetallurgy}
+              clashSquare={clashSquare}
+              onSquareClick={handleSquareClick}
+              isGameOver={isGameOver}
+            />
           ) : (
             <ChessBoard
               game={game}
@@ -1249,6 +1411,21 @@ export default function App() {
         playerXP={playerXP}
         t={t}
         lang={lang}
+        onOpenAmbassadorModal={() => setShowAmbassador(true)}
+      />
+
+      {/* Ambassador & Loyalty League, Board of Trustees & Able City Modal */}
+      <AmbassadorLoyaltyModal
+        isOpen={showAmbassador}
+        onClose={() => setShowAmbassador(false)}
+        playerRating={playerRating}
+        playerXP={playerXP}
+        playerName={playerName}
+        coins={coins}
+        onAddCoins={handleAddCoins}
+        lang={lang}
+        t={t}
+        activePresenceSeconds={activePresenceSeconds}
       />
 
       {/* Treasury & In-App Purchase Shop Modal */}
@@ -1378,6 +1555,19 @@ export default function App() {
         }}
         lang={lang}
       />
+
+      {/* Floating Loyalty EXP Notification Toast */}
+      {loyaltyToast && (
+        <div className="fixed bottom-6 right-6 z-50 p-4 rounded-2xl bg-gradient-to-r from-emerald-950 via-[#1f2820] to-amber-950 border-2 border-emerald-400 text-stone-100 shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <div className="w-9 h-9 rounded-xl bg-emerald-500/30 border border-emerald-400 flex items-center justify-center text-xl text-emerald-300">
+            ✨
+          </div>
+          <div>
+            <div className="text-xs font-black text-emerald-300">{loyaltyToast.message}</div>
+            <div className="text-[10px] text-stone-400">{lang === 'fa' ? 'ثبت در دیوان لیگ معرفان همجهان' : 'Recorded in Ambassador League Ledger'}</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
