@@ -339,3 +339,22 @@ jobs:
           name: Worldplay-Release-AAB
           path: ${{ steps.find_files.outputs.aab_path }}
           retention-days: 30
+
+      - name: 13. Create Automatic GitHub Release (Direct Download APK & AAB)
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        with:
+          tag_name: v1.4.0-release
+          name: "Worldplay Chess v1.4.0 - Android Release (APK & AAB)"
+          body: |
+            ## 👑 Worldplay Chess - همجهان شطرنج
+            ### اولین شطرنج اقتباس‌شده با تم اساطیری و کیمیاگری
+            - 📦 **Direct APK:** نصب مستقیم روی تمام گوشی‌های اندروید و کافه بازار/مایکت
+            - 🎯 **Google Play AAB:** بسته انتشار برای کنسول گوگل پلی
+            - 🏛️ **شامل:** تمدن‌های هخامنشی، سامانیان (تاجیکستان و ازبکستان)، گورکانیان، عثمانی، روسیه و ۱۳ زبان
+          files: |
+            ${{ steps.find_files.outputs.apk_path }}
+            ${{ steps.find_files.outputs.aab_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true

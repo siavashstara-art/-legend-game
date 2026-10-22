@@ -46,6 +46,8 @@ import { CivilizationModal } from './components/CivilizationModal.tsx';
 import { AndroidBuildModal } from './components/AndroidBuildModal.tsx';
 import { VictoryCardModal } from './components/VictoryCardModal.tsx';
 import { MythicCampaignModal, MythicScenario } from './components/MythicCampaignModal.tsx';
+import { OnboardingModal } from './components/OnboardingModal.tsx';
+import { FairPlayModal } from './components/FairPlayModal.tsx';
 import { CIVILIZATIONS } from './utils/civilizations.ts';
 import {
   RotateCcw,
@@ -62,7 +64,10 @@ import {
   Globe2,
   Smartphone,
   Sparkles,
-  Swords
+  Swords,
+  HelpCircle,
+  ShieldCheck,
+  ShieldAlert
 } from 'lucide-react';
 
 const BOOSTERS_CONFIG: Record<BoosterTier, number> = {
@@ -122,6 +127,10 @@ export default function App() {
   const [showAndroidModal, setShowAndroidModal] = useState<boolean>(false);
   const [showVictoryCard, setShowVictoryCard] = useState<boolean>(false);
   const [showCampaign, setShowCampaign] = useState<boolean>(false);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(() => {
+    return localStorage.getItem('worldplay_onboarding_completed') !== 'true';
+  });
+  const [showFairPlay, setShowFairPlay] = useState<boolean>(false);
   const [clashSquare, setClashSquare] = useState<Square | null>(null);
   const [gameStartTime, setGameStartTime] = useState<number>(() => Date.now());
   const [gameWinner, setGameWinner] = useState<Color>('w');
@@ -180,13 +189,13 @@ export default function App() {
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('lang', lang);
-    root.setAttribute('dir', ['fa', 'ar', 'mzn', 'glk', 'az'].includes(lang) ? 'rtl' : 'ltr');
+    root.setAttribute('dir', ['fa', 'ar'].includes(lang) ? 'rtl' : 'ltr');
     localStorage.setItem('worldplay_lang', lang);
   }, [lang]);
 
   const toggleLanguage = () => {
     setLang(prev => {
-      const langs: Language[] = ['fa', 'en', 'az', 'ar', 'mzn', 'glk'];
+      const langs: Language[] = ['fa', 'en', 'tg', 'ar', 'tr'];
       const idx = langs.indexOf(prev);
       return langs[(idx + 1) % langs.length];
     });
@@ -692,14 +701,23 @@ export default function App() {
         <header className="flex items-center justify-between pb-1.5 border-b border-[#3a322b]">
           <div className="flex items-center gap-2">
             <span className="text-2xl select-none">👑</span>
-            <div>
-              <h1 className="text-xl font-black text-[#f0c04a] tracking-tight leading-none flex items-center gap-1.5">
-                <span>{t.title}</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-base sm:text-lg font-black text-[#f0c04a] tracking-tight leading-none">
+                  {lang === 'fa' ? 'همجهان شطرنج' : lang === 'tg' ? 'Ҷаҳоншоҳмот' : 'Worldplay Chess'}
+                </span>
+                <span className="text-[9px] sm:text-[10px] text-amber-300 font-bold">
+                  {lang === 'fa' 
+                    ? '(اولین بازی اقتباس شده از شطرنج با تم اساطیری و کیمیاگری)' 
+                    : lang === 'tg'
+                    ? '(Аввалин бозии баргирифта аз шоҳмот)'
+                    : '(First Mythological & Alchemical Chess Adaptation)'}
+                </span>
+                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
                   {playerRating} ELO
                 </span>
-              </h1>
-              <p className="text-[10px] text-stone-400 font-medium hidden sm:block mt-0.5">
+              </div>
+              <p className="text-[10px] text-stone-300/90 font-medium mt-0.5 line-clamp-1">
                 {t.subTitle}
               </p>
             </div>
@@ -741,6 +759,32 @@ export default function App() {
               </span>
               <span className="font-bold text-xs hidden xs:inline">
                 {t.civilizationsBtn}
+              </span>
+            </button>
+
+            {/* Onboarding Showcase & Skill Assessment Guide */}
+            <button
+              onClick={() => setShowOnboarding(true)}
+              className="p-1.5 px-2 rounded-lg bg-[#2a1e12] hover:bg-[#3d2c1a] border border-amber-500/70 text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+              title={lang === 'fa' ? 'راهنمای آغازین، ثبت‌نام و سنجش سطح شطرنج' : 'Onboarding, Sign-In & Skill Quiz'}
+              aria-label="Onboarding"
+            >
+              <HelpCircle size={15} className="text-yellow-400" />
+              <span className="font-bold text-xs hidden sm:inline">
+                {lang === 'fa' ? 'آغاز و سنجش' : 'Guide & Quiz'}
+              </span>
+            </button>
+
+            {/* Fair Play Decree & Anti-Cheat Oath Button */}
+            <button
+              onClick={() => setShowFairPlay(true)}
+              className="p-1.5 px-2 rounded-lg bg-[#14261d] hover:bg-[#1a382a] border border-emerald-500/70 text-emerald-300 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+              title={lang === 'fa' ? 'منشور بازی جوانمردانه، منع هوش مصنوعی و اخراج متخلفان' : 'Fair Play Decree, Anti-Cheat & Expulsion Rules'}
+              aria-label="Fair Play"
+            >
+              <ShieldAlert size={15} className="text-emerald-400" />
+              <span className="font-bold text-xs hidden sm:inline">
+                {lang === 'fa' ? 'بازی جوانمردانه' : 'Fair Play'}
               </span>
             </button>
 
@@ -856,16 +900,15 @@ export default function App() {
               >
                 <option value="fa">فارسی 🇮🇷</option>
                 <option value="en">English 🇬🇧</option>
-                <option value="az">Azərbaycan 🇦🇿</option>
+                <option value="tg">Тоҷикӣ 🇹🇯</option>
                 <option value="ar">العربية 🇸🇦</option>
-                <option value="mzn">مازندرانی 🇮🇷</option>
-                <option value="glk">گیلکی 🇮🇷</option>
+                <option value="az">Azərbaycan 🇦🇿</option>
+                <option value="tr">Türkçe 🇹🇷</option>
+                <option value="ru">Русский 🇷🇺</option>
                 <option value="es">Español 🇪🇸</option>
                 <option value="zh">中文 🇨🇳</option>
-                <option value="tr">Türkçe 🇹🇷</option>
                 <option value="ja">日本語 🇯🇵</option>
                 <option value="hi">हिन्दी 🇮🇳</option>
-                <option value="ru">Русский 🇷🇺</option>
               </select>
             </div>
 
@@ -1290,6 +1333,49 @@ export default function App() {
         isOpen={showCampaign}
         onClose={() => setShowCampaign(false)}
         onLoadScenario={handleLoadScenario}
+        lang={lang}
+      />
+
+      {/* Onboarding & Skill Assessment Modal */}
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onStartVsBot={() => {
+          setGameMode('vs-bot');
+          handleNewGame();
+        }}
+        onStartPassAndPlay={() => {
+          setGameMode('pass-and-play');
+          handleNewGame();
+        }}
+        onOpenLeague={() => setShowLeague(true)}
+        onOpenAcademy={() => setShowAcademy(true)}
+        onOpenCampaign={() => setShowCampaign(true)}
+        onAddCoins={(amount) => {
+          setCoins(prev => {
+            const updated = prev + amount;
+            localStorage.setItem('worldplay_coins', String(updated));
+            return updated;
+          });
+        }}
+        lang={lang}
+      />
+
+      {/* Fair Play Decree & Anti-Cheat Oath Modal */}
+      <FairPlayModal
+        isOpen={showFairPlay}
+        onClose={() => setShowFairPlay(false)}
+        onAcceptOath={() => {
+          const alreadyClaimed = localStorage.getItem('worldplay_fairplay_reward_claimed') === 'true';
+          if (!alreadyClaimed) {
+            localStorage.setItem('worldplay_fairplay_reward_claimed', 'true');
+            setCoins(prev => {
+              const updated = prev + 20;
+              localStorage.setItem('worldplay_coins', String(updated));
+              return updated;
+            });
+          }
+        }}
         lang={lang}
       />
     </div>

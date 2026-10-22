@@ -196,6 +196,21 @@ export const LeagueModal: React.FC<LeagueModalProps> = ({
           </div>
         </div>
 
+        {/* Fair Play Anti-Cheat Callout in Leagues */}
+        <div className="mx-4 sm:mx-6 mb-3 p-2.5 rounded-xl bg-red-950/40 border border-red-500/40 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2 text-red-200">
+            <span className="text-base">🛡️</span>
+            <span>
+              {lang === 'fa' 
+                ? 'استفاده از هوش مصنوعی یا هرگونه تقلب در لیگ‌ها منجر به اخراج دائمی و باطل شدن ریتینگ خواهد شد.'
+                : 'AI engine assistance in leagues will result in permanent disqualification and rating forfeiture.'}
+            </span>
+          </div>
+          <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500/50 text-emerald-300 font-bold whitespace-nowrap">
+            Fair Play 🛡️
+          </span>
+        </div>
+
         {/* Footer */}
         <div className="p-3 bg-[#241e19] border-t border-[#3a322b] flex justify-end">
           <button

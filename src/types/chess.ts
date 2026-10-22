@@ -89,6 +89,8 @@ export interface PlayerProfile {
   name: string;
   rating: number;
   xp: number;
+  level?: number;
+  rank?: number;
   league: string;
   coins: number;
   wins: number;
@@ -108,7 +110,7 @@ export interface MoveRecord {
   fen: string;
 }
 
-export type Language = 'fa' | 'en' | 'az' | 'ar' | 'mzn' | 'glk' | 'es' | 'zh' | 'tr' | 'ja' | 'hi' | 'ru';
+export type Language = 'fa' | 'en' | 'tg' | 'az' | 'ar' | 'es' | 'zh' | 'tr' | 'ja' | 'hi' | 'ru';
 
 export interface TranslationDictionary {
   title: string;

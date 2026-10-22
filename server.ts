@@ -25,6 +25,8 @@ interface PlayerRecord {
   losses: number;
   avatar: string;
   country: string;
+  level?: number;
+  rank?: number;
 }
 
 let leaderboard: PlayerRecord[] = [
@@ -101,8 +103,8 @@ app.post('/api/scores', (req: Request, res: Response) => {
   const isWin = result === 'win';
   const isDraw = result === 'draw';
 
-  // XP calculation algorithm
-  const baseXP = isWin ? 100 : isDraw ? 40 : 20;
+  // XP calculation algorithm as specified: 500 XP for Win, 250 XP for Draw, 50 XP for participation
+  const baseXP = isWin ? 500 : isDraw ? 250 : 50;
   const speedBonus = Math.max(0, Math.floor((30 - (timeSpent || 15)) * 2));
   const efficiencyBonus = Math.max(0, (3 - (boostersUsedCount || 0)) * 15);
   const totalEarnedXP = baseXP + speedBonus + efficiencyBonus;
@@ -111,6 +113,8 @@ app.post('/api/scores', (req: Request, res: Response) => {
   const ratingDelta = isWin ? +25 : isDraw ? +5 : -15;
 
   let player = leaderboard.find(p => p.name.toLowerCase() === safeName.toLowerCase());
+  const oldLevel = player ? Math.floor(player.xp / 1000) + 1 : 1;
+
   if (player) {
     player.rating = Math.max(800, player.rating + ratingDelta);
     player.xp += totalEarnedXP;
@@ -131,6 +135,27 @@ app.post('/api/scores', (req: Request, res: Response) => {
     leaderboard.push(player);
   }
 
+  // Calculate Level (every 1000 XP is 1 level)
+  const newLevel = Math.floor(player.xp / 1000) + 1;
+  const levelUp = newLevel > oldLevel;
+  player.level = newLevel;
+
+  // Determine Level Title
+  const levelTitlesFa = [
+    'سرباز نوپا',
+    'دلاور پارس',
+    'امیر سواره‌نظام',
+    'سردار بخارا',
+    'سپهبد اساطیر',
+    'استاد اعظم چترنگ'
+  ];
+  const levelTitle = levelTitlesFa[Math.min(newLevel - 1, levelTitlesFa.length - 1)];
+
+  // Update dynamic leaderboard ranking by total XP
+  const sortedByXP = [...leaderboard].sort((a, b) => b.xp - a.xp);
+  const playerRank = sortedByXP.findIndex(p => p.id === player!.id) + 1;
+  player.rank = playerRank;
+
   // Update league according to rating
   const matchedLeague = [...LEAGUES].reverse().find(l => player!.rating >= l.minRating) || LEAGUES[0];
   player.league = matchedLeague.id;
@@ -140,7 +165,13 @@ app.post('/api/scores', (req: Request, res: Response) => {
     player,
     earnedXP: totalEarnedXP,
     ratingDelta,
-    currentLeague: matchedLeague
+    currentLeague: matchedLeague,
+    level: newLevel,
+    levelTitle,
+    levelUp,
+    rank: playerRank,
+    nextLevelXP: newLevel * 1000,
+    currentLevelProgress: player.xp % 1000
   });
 });
 

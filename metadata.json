@@ -1,6 +1,6 @@
 {
-  "name": "Worldplay Chess - همجهان شطرنج (اولین شطرنج اقتباس‌شده با تم اساطیری و کیمیاگری)",
-  "description": "Multi-lingual (Persian, English, Azerbaijani, Arabic, Gilaki, Mazandarani) mythological alchemy chess game featuring tactical time booster cards, historical scenarios, and audio feedback.",
+  "name": "Worldplay Chess - همجهان شطرنج (اولین بازی اقتباس شده از شطرنج با تم اساطیری و کیمیاگری)",
+  "description": "Multi-lingual (Persian, English, Tajik Cyrillic, Azerbaijani, Arabic, Spanish, Chinese, Turkish, Japanese, Hindi, Russian) mythological alchemy chess game featuring tactical time booster cards, historical scenarios, and audio feedback.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
