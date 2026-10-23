@@ -104,6 +104,8 @@ export const PromoVideoModal: React.FC<PromoVideoModalProps> = ({ isOpen, onClos
   const [soundMuted, setSoundMuted] = useState(false);
   const [copiedScript, setCopiedScript] = useState(false);
   const [activeTab, setActiveTab] = useState<'preview' | 'script' | 'specs'>('preview');
+  const [aspectRatio, setAspectRatio] = useState<'16:9' | '9:16'>('16:9');
+  const [vipUnlocked, setVipUnlocked] = useState(false);
 
   const animationRef = useRef<number | null>(null);
   const lastTimeRef = useRef<number>(0);
@@ -281,8 +283,37 @@ export const PromoVideoModal: React.FC<PromoVideoModalProps> = ({ isOpen, onClos
         {activeTab === 'preview' && (
           <div className="flex-1 overflow-y-auto space-y-4 pr-1">
             
-            {/* Screen Simulator (16:9 Aspect Ratio) */}
-            <div className="relative w-full aspect-video bg-black rounded-xl border border-amber-500/30 overflow-hidden shadow-2xl flex flex-col justify-between p-4 sm:p-6 group">
+            {/* Ambassador & Creator Kit Banner */}
+            <div className="p-3 bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-amber-500/15 border border-amber-500/30 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5">
+                <Crown className="w-5 h-5 text-amber-400 shrink-0" />
+                <div>
+                  <span className="font-bold text-amber-200">کیت سفیران و سازندگان محتوا (اینستاگرام، تلگرام، آپارات):</span>
+                  <p className="text-amber-100/80">قابل استفاده رایگان برای تمام بازیکنان و سفیران شطرنج بدون نیاز به هوش مصنوعی ابری (کاملاً امن و اقتصادی بدون هزینه‌های سرور ابری).</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0 bg-slate-900/90 p-1 rounded-lg border border-amber-500/30">
+                <button
+                  onClick={() => setAspectRatio('16:9')}
+                  className={`px-3 py-1 rounded-md font-bold transition-all ${
+                    aspectRatio === '16:9' ? 'bg-amber-500 text-slate-950 shadow' : 'text-amber-300 hover:bg-slate-800'
+                  }`}
+                >
+                  افقی 16:9 (آپارات/تلگرام)
+                </button>
+                <button
+                  onClick={() => setAspectRatio('9:16')}
+                  className={`px-3 py-1 rounded-md font-bold transition-all ${
+                    aspectRatio === '9:16' ? 'bg-amber-500 text-slate-950 shadow' : 'text-amber-300 hover:bg-slate-800'
+                  }`}
+                >
+                  عمودی 9:16 (استوری اینستاگرام)
+                </button>
+              </div>
+            </div>
+
+            {/* Screen Simulator (Responsive Aspect Ratio based on selection) */}
+            <div className={`relative w-full ${aspectRatio === '16:9' ? 'aspect-video' : 'aspect-[9/16] max-w-sm mx-auto'} bg-black rounded-xl border border-amber-500/30 overflow-hidden shadow-2xl flex flex-col justify-between p-4 sm:p-6 group transition-all duration-300`}>
               
               {/* Background Rendered Scene Graphic */}
               <div className="absolute inset-0 z-0 bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950/40 flex items-center justify-center overflow-hidden">
@@ -449,6 +480,39 @@ export const PromoVideoModal: React.FC<PromoVideoModalProps> = ({ isOpen, onClos
               >
                 <Download className="w-4 h-4" />
                 <span>دانلود فایل متنی سناریو (.txt)</span>
+              </button>
+            </div>
+
+            {/* VIP Ambassador Creator Monetization Feature */}
+            <div className="p-4 bg-gradient-to-r from-amber-950/60 via-slate-900 to-amber-950/60 border border-amber-500/40 rounded-xl flex items-center justify-between gap-4 mt-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-amber-500/20 rounded-xl text-amber-300 border border-amber-500/40">
+                  <Crown className="w-6 h-6 animate-pulse" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-amber-200 text-sm">
+                    {vipUnlocked ? '🌟 اشتراک ویژه VIP و ویدیوهای نامحدود فعال است' : 'اولین ویدیو رایگان | ویدیوهای اضافه و پیشرفته (۵۰۰ داریک)'}
+                  </h4>
+                  <p className="text-xs text-amber-200/70">
+                    {vipUnlocked
+                      ? 'شما به ساخت نامحدود ویدیو، قالب‌های پریمیوم و خروجی بدون واترمارک دسترسی دارید.'
+                      : 'ساخت اولین ویدیو و استوری پایه برای همه رایگان است؛ ویدیوهای اضافه و تخصصی بعدی شامل هزینه با سکه داریک می‌باشد.'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setVipUnlocked(true);
+                  playVictoryFanfare();
+                }}
+                disabled={vipUnlocked}
+                className={`px-4 py-2.5 rounded-xl font-bold text-xs shrink-0 transition-all ${
+                  vipUnlocked
+                    ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 cursor-default'
+                    : 'bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 shadow-lg shadow-amber-500/20'
+                }`}
+              >
+                {vipUnlocked ? 'فعال شد ✅' : 'ارتقا به VIP (۵۰۰ داریک)'}
               </button>
             </div>
 

@@ -54,6 +54,7 @@ export type PieceStyle =
   | 'japan'
   | 'arabia'
   | 'nordic'
+  | 'mesopotamia'
   | 'alchemy'
   | 'vector'
   | 'classic'

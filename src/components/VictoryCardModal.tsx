@@ -3,6 +3,7 @@ import { Trophy, Share2, Copy, Check, RotateCcw, X, Sparkles } from 'lucide-reac
 import { PieceStyle, BoardTheme, Color, Language } from '../types/chess.ts';
 import { CIVILIZATIONS } from '../utils/civilizations.ts';
 import { ChessPiece } from './ChessPiece.tsx';
+import { MatchMvp } from './MatchMvp.tsx';
 
 interface VictoryCardModalProps {
   isOpen: boolean;
@@ -161,6 +162,15 @@ export const VictoryCardModal: React.FC<VictoryCardModalProps> = ({
               </div>
             )}
           </div>
+
+          {/* Match MVP Evaluation Card */}
+          <MatchMvp
+            winner={winner}
+            totalMoves={totalMoves}
+            pieceStyle={pieceStyle}
+            enableMetallurgy={enableMetallurgy}
+            lang={lang}
+          />
 
           {/* Social Share Action Buttons */}
           <div className="space-y-2">

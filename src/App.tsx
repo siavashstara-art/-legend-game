@@ -51,6 +51,8 @@ import { OnboardingModal } from './components/OnboardingModal.tsx';
 import { FairPlayModal } from './components/FairPlayModal.tsx';
 import { PromoVideoModal } from './components/PromoVideoModal.tsx';
 import { CreditRepairModal } from './components/CreditRepairModal.tsx';
+import { MetalCastingSilkRoadModal } from './components/MetalCastingSilkRoadModal.tsx';
+import { WorldCivilizationsRibbon } from './components/WorldCivilizationsRibbon.tsx';
 import { CIVILIZATIONS } from './utils/civilizations.ts';
 import {
   RotateCcw,
@@ -138,6 +140,9 @@ export default function App() {
   const [showFairPlay, setShowFairPlay] = useState<boolean>(false);
   const [showPromoVideo, setShowPromoVideo] = useState<boolean>(false);
   const [showCreditRepair, setShowCreditRepair] = useState<boolean>(false);
+  const [showMetalCasting, setShowMetalCasting] = useState<boolean>(() => {
+    return localStorage.getItem('worldplay_metal_casting_shown') !== 'true';
+  });
   const [activePresenceSeconds, setActivePresenceSeconds] = useState<number>(0);
   const [loyaltyToast, setLoyaltyToast] = useState<{ message: string; exp: number } | null>(null);
   const [clashSquare, setClashSquare] = useState<Square | null>(null);
@@ -772,13 +777,30 @@ export default function App() {
     <div className="min-h-screen bg-[#14110f] text-[#f5ecd9] flex flex-col items-center p-2.5 sm:p-5 select-none transition-colors">
       <div className="w-full max-w-[540px] flex flex-col gap-2.5">
         {/* Top Branding Banner */}
-        <div className="w-full py-1.5 px-3 rounded-xl bg-gradient-to-r from-amber-950/80 via-stone-900/90 to-amber-950/80 border border-amber-500/40 text-center shadow-md flex items-center justify-center gap-2 flex-wrap text-xs">
-          <span className="font-black text-amber-300 tracking-wider">able city</span>
-          <span className="text-amber-500">•</span>
-          <span className="font-bold text-stone-200">اکوسیستم آفرینا</span>
-          <span className="text-amber-500">•</span>
-          <span className="font-mono text-emerald-400 font-bold">fb new meta</span>
+        <div className="w-full py-1.5 px-3 rounded-xl bg-gradient-to-r from-amber-950/80 via-stone-900/90 to-amber-950/80 border border-amber-500/40 text-center shadow-md flex items-center justify-between gap-2 flex-wrap text-xs">
+          <div className="flex items-center gap-2">
+            <span className="font-black text-amber-300 tracking-wider">able city</span>
+            <span className="text-amber-500">•</span>
+            <span className="font-bold text-stone-200">اکوسیستم آفرینا</span>
+          </div>
+          <button
+            onClick={() => setShowMetalCasting(true)}
+            className="px-2 py-0.5 rounded bg-amber-600/80 hover:bg-amber-500 text-stone-950 font-black text-[11px] transition-all cursor-pointer flex items-center gap-1 shadow-sm"
+          >
+            <span>🔥 ریخته‌گری & جاده ابریشم</span>
+          </button>
         </div>
+
+        {/* Multilingual World Civilizations Ribbon (Flags & Native Chess Names) */}
+        <WorldCivilizationsRibbon
+          activeStyle={pieceStyle}
+          onSelectCivilization={(style) => {
+            setPieceStyle(style);
+            playMetallicClashSound(!soundEnabled);
+          }}
+          onOpenModal={() => setShowCivilizations(true)}
+          lang={lang}
+        />
 
         {/* Top Header Row */}
         <header className="flex items-center justify-between pb-1.5 border-b border-[#3a322b]">
@@ -1655,6 +1677,23 @@ export default function App() {
           });
         }}
         lang={lang}
+      />
+
+      {/* Historic Metal Casting & Silk Road Modal */}
+      <MetalCastingSilkRoadModal
+        isOpen={showMetalCasting}
+        onClose={() => {
+          setShowMetalCasting(false);
+          localStorage.setItem('worldplay_metal_casting_shown', 'true');
+        }}
+        lang={lang}
+        onAddCoins={(amount) => {
+          setCoins(prev => {
+            const updated = prev + amount;
+            localStorage.setItem('worldplay_coins', String(updated));
+            return updated;
+          });
+        }}
       />
 
       {/* Floating Loyalty EXP Notification Toast */}
