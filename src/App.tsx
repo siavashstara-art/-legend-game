@@ -5,6 +5,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Chess, Square } from 'chess.js';
+import { calculateCombatOutcome, updateGameState, GameState, initialGameState } from './game/combatEngine';
+
 import {
   Language,
   Color,
@@ -45,6 +47,9 @@ import { LegalDisclaimerModal } from './components/LegalDisclaimerModal.tsx';
 import { CommunityRewardModal } from './components/CommunityRewardModal.tsx';
 import { CivilizationModal } from './components/CivilizationModal.tsx';
 import { AndroidBuildModal } from './components/AndroidBuildModal.tsx';
+import { Battlefield } from './combat/Battlefield.tsx';
+import { MonsterEncounter } from './components/MonsterEncounter.tsx';
+import { Shop } from './components/Shop.tsx';
 import { VictoryCardModal } from './components/VictoryCardModal.tsx';
 import { MythicCampaignModal, MythicScenario } from './components/MythicCampaignModal.tsx';
 import { OnboardingModal } from './components/OnboardingModal.tsx';
@@ -144,11 +149,14 @@ export default function App() {
     return localStorage.getItem('worldplay_metal_casting_shown') !== 'true';
   });
   const [activePresenceSeconds, setActivePresenceSeconds] = useState<number>(0);
+  const [isAppVisible, setIsAppVisible] = useState<boolean>(true);
   const [loyaltyToast, setLoyaltyToast] = useState<{ message: string; exp: number } | null>(null);
   const [clashSquare, setClashSquare] = useState<Square | null>(null);
   const [gameStartTime, setGameStartTime] = useState<number>(() => Date.now());
   const [gameWinner, setGameWinner] = useState<Color>('w');
   const [aiTip, setAiTip] = useState<string | null>(null);
+  const [isCombatMode, setIsCombatMode] = useState<boolean>(false);
+  const [combatState, setCombatState] = useState<GameState>(initialGameState);
   const [loadingAiTip, setLoadingAiTip] = useState<boolean>(false);
   const [is3D, setIs3D] = useState<boolean>(() => {
     const saved = localStorage.getItem('worldplay_is3d_v2');
@@ -158,6 +166,15 @@ export default function App() {
     }
     return saved === 'true';
   });
+
+  // Handle Visibility Change to prevent auto-fail on interruptions
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsAppVisible(document.visibilityState === 'visible');
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   // VIP In-Game Perks unlocked via Socials
   const [unlockedPlatinum, setUnlockedPlatinum] = useState<boolean>(() => {
@@ -211,6 +228,19 @@ export default function App() {
     root.setAttribute('dir', ['fa', 'ar'].includes(lang) ? 'rtl' : 'ltr');
     localStorage.setItem('worldplay_lang', lang);
   }, [lang]);
+
+  // Handle Visibility Change to prevent auto-fail on interruptions
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        console.log('App hidden, game state saved.');
+      } else {
+        console.log('App resumed, game state loaded.');
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   const toggleLanguage = () => {
     setLang(prev => {
@@ -358,7 +388,7 @@ export default function App() {
 
   // Main turn countdown timer loop
   useEffect(() => {
-    if (isGameOver) return;
+    if (isGameOver || !isAppVisible) return;
 
     const interval = setInterval(() => {
       const rem = calculateRemaining();
@@ -380,7 +410,7 @@ export default function App() {
     }, 80);
 
     return () => clearInterval(interval);
-  }, [isGameOver, calculateRemaining, handleTimeout, soundEnabled]);
+  }, [isGameOver, isAppVisible, calculateRemaining, handleTimeout, soundEnabled]);
 
   // Reset/Start new turn
   const startNewTurn = useCallback(() => {
@@ -466,8 +496,20 @@ export default function App() {
         setTimeout(() => setClashSquare(null), 500);
         playCaptureSound(!soundEnabled);
         playMetallicClashSound(!soundEnabled);
+        
+        // Monster Combat Engine Integration
+        if (isCombatMode) {
+          const outcome = calculateCombatOutcome(moveRes.san, combatState);
+          setCombatState(prev => updateGameState(outcome.action, outcome.damage, prev));
+        }
       } else {
         playMoveSound(!soundEnabled);
+        
+        // Monster Combat Engine Integration (even for non-capture moves, maybe smaller damage)
+        if (isCombatMode) {
+           const outcome = calculateCombatOutcome(moveRes.san, combatState);
+           setCombatState(prev => updateGameState(outcome.action, Math.floor(outcome.damage / 2), prev));
+        }
       }
 
       // Add to move history
@@ -777,6 +819,12 @@ export default function App() {
     <div className="min-h-screen bg-[#14110f] text-[#f5ecd9] flex flex-col items-center p-2.5 sm:p-5 select-none transition-colors">
       <div className="w-full max-w-[540px] flex flex-col gap-2.5">
         {/* Top Branding Banner */}
+        {isCombatMode && (
+          <div className="w-full py-1.5 px-3 rounded-xl bg-rose-950/90 border border-rose-500/50 text-white text-center text-xs font-bold flex justify-between">
+            <span>Monster HP: {combatState.monsterHealth}</span>
+            <span>Player HP: {combatState.playerHealth}</span>
+          </div>
+        )}
         <div className="w-full py-1.5 px-3 rounded-xl bg-gradient-to-r from-amber-950/80 via-stone-900/90 to-amber-950/80 border border-amber-500/40 text-center shadow-md flex items-center justify-between gap-2 flex-wrap text-xs">
           <div className="flex items-center gap-2">
             <span className="font-black text-amber-300 tracking-wider">able city</span>
@@ -801,6 +849,10 @@ export default function App() {
           onOpenModal={() => setShowCivilizations(true)}
           lang={lang}
         />
+
+        {/* Combat Components */}
+        <MonsterEncounter />
+        <Shop />
 
         {/* Top Header Row */}
         <header className="flex items-center justify-between pb-1.5 border-b border-[#3a322b]">
@@ -1035,6 +1087,13 @@ export default function App() {
               aria-label="Open settings"
             >
               <Settings size={16} />
+            </button>
+            <button
+              onClick={() => setIsCombatMode(!isCombatMode)}
+              className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${isCombatMode ? 'bg-rose-900 border-rose-500 text-rose-200' : 'bg-[#241e19] border-[#5a4630]/60 text-stone-300'}`}
+              title="نبرد متحد با هیولا"
+            >
+              <Swords size={16} />
             </button>
 
             {/* Language Switcher */}
@@ -1695,6 +1754,8 @@ export default function App() {
           });
         }}
       />
+
+      {isCombatMode && <Battlefield />}
 
       {/* Floating Loyalty EXP Notification Toast */}
       {loyaltyToast && (
