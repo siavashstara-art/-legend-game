@@ -49,6 +49,7 @@ import { CivilizationModal } from './components/CivilizationModal.tsx';
 import { AndroidBuildModal } from './components/AndroidBuildModal.tsx';
 import { Battlefield } from './combat/Battlefield.tsx';
 import { MonsterEncounter } from './components/MonsterEncounter.tsx';
+import { MonsterBattleModal } from './components/MonsterBattleModal.tsx';
 import { Shop } from './components/Shop.tsx';
 import { VictoryCardModal } from './components/VictoryCardModal.tsx';
 import { MythicCampaignModal, MythicScenario } from './components/MythicCampaignModal.tsx';
@@ -148,6 +149,8 @@ export default function App() {
   const [showMetalCasting, setShowMetalCasting] = useState<boolean>(() => {
     return localStorage.getItem('worldplay_metal_casting_shown') !== 'true';
   });
+  const [showMonsterBattle, setShowMonsterBattle] = useState<boolean>(false);
+
   const [activePresenceSeconds, setActivePresenceSeconds] = useState<number>(0);
   const [isAppVisible, setIsAppVisible] = useState<boolean>(true);
   const [loyaltyToast, setLoyaltyToast] = useState<{ message: string; exp: number } | null>(null);
@@ -1024,6 +1027,17 @@ export default function App() {
               </span>
             </button>
 
+            {/* Monster Battle Arena Button */}
+            <button
+              onClick={() => setShowMonsterBattle(true)}
+              className="p-1.5 px-2 rounded-lg bg-red-950/80 hover:bg-red-900 border border-red-500/60 text-red-300 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
+              title="Monster Battle Arena"
+              aria-label="Monster Battle Arena"
+            >
+              <Swords size={15} className="text-red-400" />
+              <span className="font-bold text-xs hidden sm:inline">Arena</span>
+            </button>
+
             {/* Treasury Shop Button */}
             <button
               onClick={() => setShowTreasury(true)}
@@ -1034,6 +1048,7 @@ export default function App() {
               <Coins size={16} />
               <span className="font-mono text-xs hidden sm:inline">{coins}</span>
             </button>
+
 
             {/* Financial Wisdom & US/Canada Credit Repair Button */}
             <button
@@ -1650,6 +1665,12 @@ export default function App() {
         onClose={() => setShowAndroidModal(false)}
         lang={lang}
       />
+
+      <MonsterBattleModal
+        isOpen={showMonsterBattle}
+        onClose={() => setShowMonsterBattle(false)}
+      />
+
 
       {/* Royal Victory Social Share Card Modal */}
       <VictoryCardModal

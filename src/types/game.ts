@@ -30,9 +30,26 @@ export interface Monster {
   attackPower: number;
 }
 
+export interface MonsterCard {
+  id: string;
+  name: string;
+  powerLevel: number;
+  healthPoints: number;
+  elementCategory: string;
+  isUnlocked: boolean;
+}
+
+export interface BattleRecord {
+  id: string;
+  playerMonsterName: string;
+  enemyMonsterName: string;
+  isVictory: boolean;
+  earnedStars: number;
+  timestamp: number;
+}
+
 export interface GameState {
   player: Player;
   monster: Monster;
   combatMode: 'pvp' | 'pve' | 'idle';
-  // ...
 }
