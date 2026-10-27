@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 1. Checkout Repository Source Code
+      - name: 1. Checkout Repository
         uses: actions/checkout@v4
 
       - name: 2. Set up Node.js 20
@@ -35,43 +35,39 @@ jobs:
           fi
 
       - name: 4. Set up Java JDK 17
+        id: setup-java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
 
-      - name: 5. Accept Android SDK Licenses & Configure Environment
-        run: |
-          mkdir -p "$ANDROID_HOME/licenses"
-          echo -e "\n8933011224571460b53530110012a3e05d69d3f1\nd56f5187479451eabf01fb78af6dfcb131a6481e\n24333f8a63718c15525996be8863422264ae0686\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-license"
-          echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
-          if [ -d "$ANDROID_HOME/cmdline-tools/latest/bin" ]; then
-            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
-          fi
+      - name: 5. Set up Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: 6. Set up Gradle 8.5
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.5'
 
-      - name: 7. Provision Gradle Wrapper Jar & Make Executable
+      - name: 7. Prepare Gradle Wrapper & Permissions
         run: |
           if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
             gradle wrapper --gradle-version 8.5
           fi
           chmod +x gradlew
 
-      - name: 8. Generate Production Keystore (Automated Fallback)
+      - name: 8. Verify / Generate Production Release Keystore
         run: |
           mkdir -p app
           if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
-            echo "Using user-defined GitHub Secret Keystore..."
+            echo "Using custom GitHub Secret Keystore..."
             echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/release.keystore
             echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
             echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
             echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
-          else
-            echo "Auto-generating release keystore for Cafe Bazaar & Myket..."
+          elif [ ! -f "app/release.keystore" ]; then
+            echo "Generating production release keystore for Cafe Bazaar & Myket..."
             keytool -genkeypair -v \
               -keystore app/release.keystore \
               -alias worldplay \
@@ -85,56 +81,78 @@ jobs:
             echo "KEYSTORE_PASSWORD=worldplay123" >> $GITHUB_ENV
             echo "KEY_ALIAS=worldplay" >> $GITHUB_ENV
             echo "KEY_PASSWORD=worldplay123" >> $GITHUB_ENV
+          else
+            echo "Pre-packaged release keystore found at app/release.keystore."
+            echo "KEYSTORE_PASSWORD=worldplay123" >> $GITHUB_ENV
+            echo "KEY_ALIAS=worldplay" >> $GITHUB_ENV
+            echo "KEY_PASSWORD=worldplay123" >> $GITHUB_ENV
           fi
-          echo "KEYSTORE_PATH=release.keystore" >> $GITHUB_ENV
 
-      - name: 9. Build Signed Release APK
-        run: ./gradlew assembleRelease --stacktrace
+      - name: 9. Build Release APK & Debug APK
+        run: |
+          ./gradlew assembleRelease assembleDebug --stacktrace
 
-      - name: 10. Build Signed Release AAB (Google Play / Bazaar Bundle)
-        run: ./gradlew bundleRelease --stacktrace
+      - name: 10. Build Production AAB (Google Play / Bazaar Bundle)
+        run: |
+          ./gradlew bundleRelease --stacktrace
 
       - name: 11. Locate Artifact Files
         id: find_files
         run: |
-          APK_FILE=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
-          AAB_FILE=$(find app/build/outputs/bundle/release -name "*.aab" | head -n 1)
-          echo "Found APK: $APK_FILE"
-          echo "Found AAB: $AAB_FILE"
-          echo "apk_path=$APK_FILE" >> $GITHUB_OUTPUT
-          echo "aab_path=$AAB_FILE" >> $GITHUB_OUTPUT
+          RELEASE_APK=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          DEBUG_APK=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          RELEASE_AAB=$(find app/build/outputs/bundle/release -name "*.aab" | head -n 1)
+          echo "Found Release APK: $RELEASE_APK"
+          echo "Found Debug APK: $DEBUG_APK"
+          echo "Found Release AAB: $RELEASE_AAB"
+          echo "release_apk=$RELEASE_APK" >> $GITHUB_OUTPUT
+          echo "debug_apk=$DEBUG_APK" >> $GITHUB_OUTPUT
+          echo "release_aab=$RELEASE_AAB" >> $GITHUB_OUTPUT
 
-      - name: 12. Upload Release APK Artifact
+      - name: 12. Upload Signed Release APK Artifact
         uses: actions/upload-artifact@v4
-        if: steps.find_files.outputs.apk_path != ''
+        if: steps.find_files.outputs.release_apk != ''
         with:
-          name: Worldplay-Release-APK
-          path: ${{ steps.find_files.outputs.apk_path }}
+          name: Worldplay-Signed-Release-APK
+          path: ${{ steps.find_files.outputs.release_apk }}
           retention-days: 30
 
-      - name: 13. Upload Release AAB (Bundle) Artifact
+      - name: 13. Upload Debug APK Artifact (Instant Testing)
         uses: actions/upload-artifact@v4
-        if: steps.find_files.outputs.aab_path != ''
+        if: steps.find_files.outputs.debug_apk != ''
         with:
-          name: Worldplay-Release-AAB
-          path: ${{ steps.find_files.outputs.aab_path }}
+          name: Worldplay-Debug-APK
+          path: ${{ steps.find_files.outputs.debug_apk }}
           retention-days: 30
 
-      - name: 14. Create Automatic GitHub Release (Direct Download APK & AAB)
+      - name: 14. Upload Release AAB (App Bundle) Artifact
+        uses: actions/upload-artifact@v4
+        if: steps.find_files.outputs.release_aab != ''
+        with:
+          name: Worldplay-Signed-Release-AAB
+          path: ${{ steps.find_files.outputs.release_aab }}
+          retention-days: 30
+
+      - name: 15. Create Automatic GitHub Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         with:
-          tag_name: v1.4.0-release
-          name: "Worldplay Chess v1.4.0 - Android Release (APK & AAB)"
+          tag_name: v1.4.1-release
+          name: "Worldplay Chess & Monster Battle v1.4.1 - Android Release (APK & AAB)"
           body: |
-            ## 👑 Worldplay Chess - همجهان شطرنج
-            ### اولین بازی اقتباس شده از شطرنج با تم اساطیری و کیمیاگری
-            - 📦 **Direct APK:** نسخه امضاشده نهایی برای نصب مستقیم روی گوشی‌ها، کافه بازار و مایکت
-            - 🎯 **Google Play AAB:** فایل رسمی App Bundle برای انتشار در مارکت‌ها
-            - 🛡️ **امضای دیجیتال:** امضای دوگانه V1 (JAR) و V2 (Full APK Signature) مخصوص قوانین کافه بازار و مایکت
+            ## 👑 Worldplay Chess & Monster Battle - همجهان شطرنج و نبرد هیولا
+            ### نسخه نهایی اندروید با امضای رسمی (Signed APK & AAB)
+            - 📦 **فایل Signed Release APK:** امضاشده دوگانه V1 + V2 برای نصب مستقیم، کافه بازار و مایکت
+            - 🎯 **فایل Google Play Release AAB:** بسته رسمی Android App Bundle برای کنسول توسعه‌دهندگان گوگل‌پلی و کافه بازار
+            - 🧪 **فایل Debug APK:** نسخه بدون نیاز به امضا برای تست سریع روی گوشی
+            - 🔑 **مشخصات امضا:**
+              - Alias: `worldplay`
+              - Password: `worldplay123`
+              - Type: `PKCS12 / RSA 2048`
           files: |
-            ${{ steps.find_files.outputs.apk_path }}
-            ${{ steps.find_files.outputs.aab_path }}
+            ${{ steps.find_files.outputs.release_apk }}
+            ${{ steps.find_files.outputs.debug_apk }}
+            ${{ steps.find_files.outputs.release_aab }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true

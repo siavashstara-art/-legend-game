@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build && esbuild server.ts --platform=node --bundle --outfile=server.js --external:express --external:dotenv --external:@google/genai --external:vite && mkdir -p app/src/main/assets && cp -r dist/* app/src/main/assets/",
+    "build:apk": "bash scripts/build-apk.sh",
     "start": "node server.js",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",

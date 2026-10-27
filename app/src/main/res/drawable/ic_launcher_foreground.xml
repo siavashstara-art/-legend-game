@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Chess King Crown Base in Gold -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M34,68 L74,68 L72,74 L36,74 Z" />
+    <!-- Crown Spikes -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M34,66 L30,44 L44,54 L54,34 L64,54 L78,44 L74,66 Z" />
+    <!-- Crown Center Gem / Monster Eye -->
+    <path
+        android:fillColor="#EF4444"
+        android:pathData="M54,48 L58,54 L54,60 L50,54 Z" />
+    <!-- Left Gem -->
+    <path
+        android:fillColor="#3B82F6"
+        android:pathData="M40,54 A3,3 0 1,1 40,54.1" />
+    <!-- Right Gem -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M68,54 A3,3 0 1,1 68,54.1" />
+</vector>

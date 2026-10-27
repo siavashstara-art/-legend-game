@@ -842,6 +842,36 @@ export default function App() {
           </button>
         </div>
 
+        {/* PROMINENT HERO CARD FOR UNITED BATTLE (معبد متحد) */}
+        <div className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-rose-950 via-amber-950 to-rose-950 border-2 border-amber-500/80 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-right" dir="rtl">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-rose-600 p-2.5 text-stone-950 font-black shadow-lg flex items-center justify-center shrink-0">
+              <Swords size={24} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-amber-300 text-sm sm:text-base">⚔️ معبد متحد (نبرد هیولاهای اساطیری)</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-stone-950 animate-pulse">
+                  بازی ویژه
+                </span>
+              </div>
+              <p className="text-[11px] text-stone-300 mt-0.5">
+                وارد معبد متحد شوید، هیولای آتشین یا آبی خود را برگزینید و حریفان را در نبردی نوبتی شکست دهید!
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+            <button
+              onClick={() => setShowMonsterBattle(true)}
+              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-rose-500 hover:from-amber-300 hover:to-rose-400 text-stone-950 font-black text-xs shadow-xl transition-all transform hover:scale-105 cursor-pointer flex items-center justify-center gap-2 border border-amber-300"
+            >
+              <Swords size={18} />
+              <span>🎮 ورود به بازی معبد متحد</span>
+            </button>
+          </div>
+        </div>
+
         {/* Multilingual World Civilizations Ribbon (Flags & Native Chess Names) */}
         <WorldCivilizationsRibbon
           activeStyle={pieceStyle}
@@ -1027,15 +1057,17 @@ export default function App() {
               </span>
             </button>
 
-            {/* Monster Battle Arena Button */}
+            {/* Monster Battle Arena / United Temple Button */}
             <button
               onClick={() => setShowMonsterBattle(true)}
-              className="p-1.5 px-2 rounded-lg bg-red-950/80 hover:bg-red-900 border border-red-500/60 text-red-300 transition-colors cursor-pointer flex items-center gap-1.5 shadow-sm"
-              title="Monster Battle Arena"
+              className="p-1.5 px-2.5 rounded-lg bg-gradient-to-r from-rose-950 to-amber-950 hover:from-rose-900 hover:to-amber-900 border border-amber-500 text-amber-200 transition-all cursor-pointer flex items-center gap-1.5 shadow-md ring-1 ring-amber-500/50"
+              title="معبد متحد • نبرد کارت‌های هیولا"
               aria-label="Monster Battle Arena"
             >
-              <Swords size={15} className="text-red-400" />
-              <span className="font-bold text-xs hidden sm:inline">Arena</span>
+              <Swords size={16} className="text-amber-400" />
+              <span className="font-black text-xs hidden sm:inline">
+                ⚔️ معبد متحد
+              </span>
             </button>
 
             {/* Treasury Shop Button */}
@@ -1655,6 +1687,11 @@ export default function App() {
         enableMetallurgy={enableMetallurgy}
         onToggleMetallurgy={handleToggleMetallurgy}
         onSelectCivilization={handleSelectCivilization}
+        onOpenMonsterBattle={(style, theme) => {
+          handleSelectCivilization(style, theme);
+          setShowCivilizations(false);
+          setShowMonsterBattle(true);
+        }}
         t={t}
         lang={lang}
       />
