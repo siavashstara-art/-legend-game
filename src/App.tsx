@@ -59,6 +59,7 @@ import { PromoVideoModal } from './components/PromoVideoModal.tsx';
 import { CreditRepairModal } from './components/CreditRepairModal.tsx';
 import { MetalCastingSilkRoadModal } from './components/MetalCastingSilkRoadModal.tsx';
 import { WorldCivilizationsRibbon } from './components/WorldCivilizationsRibbon.tsx';
+import { PuzzleDesignerModal } from './components/PuzzleDesignerModal.tsx';
 import { CIVILIZATIONS } from './utils/civilizations.ts';
 import {
   RotateCcw,
@@ -81,7 +82,8 @@ import {
   ShieldAlert,
   Share2,
   Film,
-  CreditCard
+  CreditCard,
+  Wand2
 } from 'lucide-react';
 
 const BOOSTERS_CONFIG: Record<BoosterTier, number> = {
@@ -150,6 +152,7 @@ export default function App() {
     return localStorage.getItem('worldplay_metal_casting_shown') !== 'true';
   });
   const [showMonsterBattle, setShowMonsterBattle] = useState<boolean>(false);
+  const [showPuzzleDesigner, setShowPuzzleDesigner] = useState<boolean>(false);
 
   const [activePresenceSeconds, setActivePresenceSeconds] = useState<number>(0);
   const [isAppVisible, setIsAppVisible] = useState<boolean>(true);
@@ -786,6 +789,29 @@ export default function App() {
     playCivilizationAnthem(scenario.civId, !soundEnabled);
   };
 
+  const handlePlaytestPuzzle = useCallback((fen: string, turn: Color) => {
+    try {
+      const newGame = new Chess(fen);
+      setGame(newGame);
+      setSelectedSquare(null);
+      setValidTargets([]);
+      setLastMove(null);
+      setMoveHistory([]);
+      setCapturedWhite([]);
+      setCapturedBlack([]);
+      setPendingPromotion(null);
+      setIsGameOver(false);
+      setResultMessage('');
+      setGameOverModalOpen(false);
+      setTurnStartMs(Date.now());
+      setRemainingSeconds(baseTurnSeconds);
+      lastTickSecond.current = -1;
+      playMoveSound(!soundEnabled);
+    } catch (e) {
+      console.error('Failed to load custom puzzle position:', e);
+    }
+  }, [baseTurnSeconds, soundEnabled]);
+
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -868,6 +894,36 @@ export default function App() {
             >
               <Swords size={18} />
               <span>🎮 ورود به بازی معبد متحد</span>
+            </button>
+          </div>
+        </div>
+
+        {/* PROMINENT HERO CARD FOR PUZZLE DESIGNER (طراح معما) */}
+        <div className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-purple-950 via-amber-950 to-indigo-950 border-2 border-amber-500/80 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-right" dir="rtl">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500 to-amber-500 p-2.5 text-stone-950 font-black shadow-lg flex items-center justify-center shrink-0">
+              <Wand2 size={24} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-amber-300 text-sm sm:text-base">🎨 طراح معما & سازنده مرحله (اتوماسیون ساده)</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-stone-950">
+                  استودیوی مرحله‌سازی
+                </span>
+              </div>
+              <p className="text-[11px] text-stone-300 mt-0.5">
+                بدون پیچیدگی، مهره‌ها را روی تخته بگذارید، معما بسازید و مستقیماً تست زنده بگیرید!
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+            <button
+              onClick={() => setShowPuzzleDesigner(true)}
+              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 via-amber-500 to-indigo-500 hover:from-purple-400 hover:to-indigo-400 text-stone-950 font-black text-xs shadow-xl transition-all transform hover:scale-105 cursor-pointer flex items-center justify-center gap-2 border border-amber-300"
+            >
+              <Wand2 size={18} />
+              <span>🎨 ورود به استودیوی طراح معما</span>
             </button>
           </div>
         </div>
@@ -1693,6 +1749,14 @@ export default function App() {
           setShowMonsterBattle(true);
         }}
         t={t}
+        lang={lang}
+      />
+
+      {/* Puzzle Designer & Level Creator Modal */}
+      <PuzzleDesignerModal
+        isOpen={showPuzzleDesigner}
+        onClose={() => setShowPuzzleDesigner(false)}
+        onPlaytestPuzzle={handlePlaytestPuzzle}
         lang={lang}
       />
 
